@@ -152,7 +152,23 @@ const lines = Array.from({ length: 8 }, (_, i) => ({
     object-fit: cover;
   }
 
-  svg {
+  /* A screenshot sits in the cover like a window: inset from the top left,
+     running off the bottom right, so the status badge has room above it. */
+  .cover:has(:global(img)) {
+    padding: 3.5rem 0 0 clamp(1.25rem, 4%, 2.5rem);
+  }
+
+  .cover :global(img) {
+    object-position: top left;
+    border-top-left-radius: var(--r-s);
+    border-top: 1px solid var(--line-strong);
+    border-left: 1px solid var(--line-strong);
+    box-shadow: 0 0 3rem rgb(0 0 0 / 0.45);
+    transform-origin: top left;
+  }
+
+  svg,
+  .cover :global(img) {
     transition: transform 1.2s var(--ease);
   }
 

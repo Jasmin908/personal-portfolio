@@ -1,6 +1,11 @@
 import type { ImageMetadata } from 'astro';
 import type { Localized } from '../i18n/config';
 
+// Screenshots of the live applications (real captures, with demo data).
+import habitflowCalendar from '../assets/projects/habitflow-calendar.webp';
+import habitflowDashboard from '../assets/projects/habitflow-dashboard.webp';
+import habitflowStatistics from '../assets/projects/habitflow-statistics.webp';
+
 /**
  * PROJECT DATA
  *
@@ -15,7 +20,7 @@ import type { Localized } from '../i18n/config';
  * shown as "to follow" and are not clickable.
  */
 
-export type ProjectStatus = 'live' | 'in-development' | 'prototype' | 'planned';
+export type ProjectStatus = 'completed' | 'in-development' | 'prototype' | 'planned';
 export type CoverVariant = 'grid' | 'dialog' | 'timeline' | 'scan';
 export type Accent = 'violet' | 'blue' | 'lime';
 
@@ -50,46 +55,101 @@ export interface Project {
   title: Localized<string>;
   tagline: Localized<string>;
   summary: Localized<string>;
+  /** Short list shown on the detail page. Only list what really exists. */
+  features?: Localized<string[]>;
   caseStudy: Localized<CaseStudy>;
 }
 
 export const projects: Project[] = [
   {
     slug: 'habitflow',
-    status: 'in-development',
+    status: 'completed',
     cover: 'grid',
     accent: 'violet',
-    stack: ['JavaScript', 'HTML', 'CSS'],
+    image: habitflowDashboard,
+    imageAlt: {
+      de: 'HabitFlow-Dashboard mit Tagesübersicht, Wochenleiste und fünf Beispiel-Gewohnheiten',
+      en: 'HabitFlow dashboard with the daily overview, week strip and five example habits',
+    },
+    screenshots: [
+      {
+        src: habitflowStatistics,
+        alt: {
+          de: 'Statistikseite von HabitFlow mit Wochen- und Monatsquote sowie zwei Diagrammen',
+          en: 'HabitFlow statistics page with weekly and monthly rates and two charts',
+        },
+      },
+      {
+        src: habitflowCalendar,
+        alt: {
+          de: 'Kalenderseite von HabitFlow mit Monatsansicht und den Gewohnheiten des gewählten Tages',
+          en: 'HabitFlow calendar page with the month view and the habits of the selected day',
+        },
+      },
+    ],
+    stack: ['JavaScript', 'HTML', 'CSS', 'Vite', 'Chart.js'],
+    demoUrl: 'https://jasmin-habitflow.netlify.app',
+    repoUrl: 'https://github.com/Jasmin908/habitflow',
     title: { de: 'HabitFlow', en: 'HabitFlow' },
     tagline: { de: 'Gewohnheiten & Fortschritt', en: 'Habits & Progress' },
     summary: {
-      de: 'Eine Webanwendung, mit der sich persönliche Gewohnheiten festhalten und Fortschritte verfolgen lassen. Diagramme und Statistiken sollen dabei helfen, die eigene Entwicklung besser zu verstehen.',
-      en: 'A web application for tracking personal habits and monitoring progress. Charts and statistics will help users better understand how their habits develop over time.',
+      de: 'Ein Habit-Tracker, der komplett im Browser läuft: Gewohnheiten anlegen, täglich abhaken und den Fortschritt über Serien, Statistiken und einen Kalender verfolgen. Ohne Konto, die Daten bleiben auf dem eigenen Gerät.',
+      en: 'A habit tracker that runs entirely in the browser: create habits, tick them off each day, and follow your progress through streaks, statistics and a calendar. No account, and the data stays on your own device.',
+    },
+    features: {
+      de: [
+        'Gewohnheiten anlegen, bearbeiten und löschen, mit Kategorie und Symbol',
+        'Flexible Zeitpläne: täglich oder an ausgewählten Wochentagen',
+        'Täglicher Fortschritt auf einem Dashboard mit Wochenübersicht',
+        'Serien, die nur geplante Tage zählen',
+        'Statistiken und Diagramme zu Wochen- und Monatsquoten',
+        'Interaktiver Kalender, in dem sich vergangene Tage korrigieren lassen',
+        'Dunkles und helles Design',
+        'Speicherung lokal im Browser, ohne Konto',
+        'Export und Import der Daten als JSON',
+        'Responsives Layout für Desktop und Smartphone',
+      ],
+      en: [
+        'Create, edit and delete habits, each with a category and an icon',
+        'Flexible schedules: every day or on selected weekdays',
+        'Daily progress on a dashboard with a week overview',
+        'Streaks that only count the days a habit was scheduled for',
+        'Statistics and charts for weekly and monthly completion',
+        'An interactive calendar where past days can be corrected',
+        'Dark and light themes',
+        'Data stored locally in the browser, with no account',
+        'JSON export and import',
+        'Responsive layout for desktop and phones',
+      ],
     },
     caseStudy: {
       de: {
         overview:
-          'HabitFlow soll Gewohnheiten nicht nur abhaken, sondern Muster zeigen: Was klappt regelmässig, und wann bricht etwas ab? Das Projekt ist in Entwicklung, Funktionsumfang und Oberfläche verändern sich noch.',
+          'HabitFlow ist ein Habit-Tracker mit vier Ansichten: einem Dashboard für den Tag, einer Statistikseite, einem Monatskalender und den Einstellungen. Die Anwendung ist veröffentlicht und läuft vollständig im Browser.',
         problem:
-          'Viele Habit-Tracker zeigen vor allem eine Reihe von Häkchen. Daraus lässt sich schwer ablesen, warum eine Gewohnheit hält oder scheitert.',
+          'Viele Habit-Tracker zeigen vor allem eine Reihe von Häkchen. Daraus lässt sich schwer ablesen, wie regelmässig man wirklich dranbleibt – besonders bei Gewohnheiten, die nicht jeden Tag anstehen.',
         solution:
-          'Geplant ist eine schlichte tägliche Erfassung, kombiniert mit Auswertungen über längere Zeiträume – etwa Verläufe und Vergleiche zwischen Wochen.',
+          'HabitFlow verbindet eine schlichte tägliche Erfassung mit Auswertungen über längere Zeit: Serien pro Gewohnheit, Wochen- und Monatsquoten, zwei Diagramme und ein Kalender, der jeden Tag als erledigt, teilweise erledigt oder verpasst zeigt. Gezählt werden nur Tage, an denen eine Gewohnheit geplant war.',
         implementation:
-          'Der technische Aufbau entsteht gerade. Im Zentrum steht ein sauberes Datenmodell für Gewohnheiten und Einträge, auf dem die Auswertungen aufbauen. Details folgen, sobald die Architektur steht.',
+          'Die Anwendung ist in JavaScript mit ES-Modulen geschrieben, ohne Framework, und wird mit Vite gebaut. Die Logik für Daten, Zeitpläne und Statistiken ist von der Darstellung getrennt und wird mit dem Test-Runner von Node geprüft. Chart.js wird erst geladen, wenn die Statistikseite geöffnet wird. Gespeichert wird im localStorage des Browsers; die Daten lassen sich als JSON exportieren und wieder importieren.',
         challenges:
-          'Auswertungen, die ehrlich bleiben: Lücken in den Daten sinnvoll behandeln und nur Statistiken zeigen, die wirklich etwas aussagen.',
+          'Am meisten Sorgfalt brauchten die Datumslogik und die Zeitpläne. Tage richten sich nach dem lokalen Kalender statt nach UTC, damit sich ein Eintrag um Mitternacht nicht verschiebt. Und wenn man die Wochentage einer Gewohnheit ändert, darf das die Vergangenheit nicht umschreiben: Jede Gewohnheit führt deshalb einen Verlauf ihrer Zeitpläne.',
+        learnings:
+          'Statistiken sind nur so gut wie die Regeln dahinter. Erst klar festzulegen, was als geplant, erledigt oder verpasst gilt, und diese Regeln dann mit Tests abzusichern, hat mehr gebracht als jede zusätzliche Funktion.',
       },
       en: {
         overview:
-          "HabitFlow is meant to do more than tick off habits: it should reveal patterns. What works consistently, and when do things fall apart? The project is in development, so features and interface are still changing.",
+          'HabitFlow is a habit tracker with four views: a dashboard for the day, a statistics page, a monthly calendar and settings. The application is released and runs entirely in the browser.',
         problem:
-          'Many habit trackers mostly show a row of check marks. That makes it hard to see why a habit sticks or fails.',
+          "Many habit trackers mostly show a row of check marks. That makes it hard to see how consistently you are really keeping up, especially with habits that aren't due every day.",
         solution:
-          'The plan is a simple daily log combined with analysis over longer periods, such as trends and week-to-week comparisons.',
+          'HabitFlow combines a simple daily log with a view over longer periods: a streak for each habit, weekly and monthly completion rates, two charts, and a calendar that shows every day as done, partly done or missed. Only the days a habit was scheduled for are counted.',
         implementation:
-          'The technical structure is taking shape right now. At its centre is a clean data model for habits and entries that the analytics build on. Details will follow once the architecture has settled.',
+          "The application is written in JavaScript with ES modules, without a framework, and built with Vite. The logic for dates, schedules and statistics is kept separate from the interface and is checked with Node's test runner. Chart.js is only loaded when the statistics page is opened. Data is stored in the browser's localStorage and can be exported and imported as JSON.",
         challenges:
-          'Keeping the analytics honest: handling gaps in the data sensibly and only showing statistics that actually mean something.',
+          "The date logic and the schedules needed the most care. Days follow the local calendar instead of UTC, so an entry doesn't shift around midnight. And changing a habit's weekdays must not rewrite the past, so each habit keeps a history of its schedules.",
+        learnings:
+          'Statistics are only as good as the rules behind them. Deciding clearly what counts as scheduled, done or missed, and then securing those rules with tests, was worth more than any additional feature.',
       },
     },
   },

@@ -43,7 +43,7 @@ the generated placeholder (`cover: 'grid' | 'dialog' | 'timeline' | 'scan'`) is 
 **Links:** set `demoUrl` and `repoUrl` once they exist. Until then they are shown
 as "to follow" and are not clickable.
 
-**Status values:** `planned`, `prototype`, `in-development`, `live`.
+**Status values:** `planned`, `prototype`, `in-development`, `completed`.
 Labels are in `src/i18n/ui.ts` under `status`.
 
 ## Other common edits

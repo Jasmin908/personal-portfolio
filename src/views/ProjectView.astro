@@ -23,8 +23,12 @@ const alternates = Object.fromEntries(
   localeCodes.map((code) => [code, projectPath(code, project.slug)]),
 ) as Record<Locale, string>;
 
+const features = project.features?.[locale] ?? [];
+
 const chapters = [
   { title: t.project.overview, text: study.overview },
+  // Shown as a list, and only for projects that have features to list.
+  ...(features.length > 0 ? [{ title: t.project.features, list: features }] : []),
   { title: t.project.problem, text: study.problem },
   { title: t.project.solution, text: study.solution },
   { title: t.project.implementation, text: study.implementation },
@@ -86,7 +90,15 @@ const screenshots = project.screenshots ?? [];
                 <span aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
                 {chapter.title}
               </h2>
-              <p class:list={{ pending: chapter.pending }}>{chapter.text}</p>
+              {chapter.list ? (
+                <ul class="features">
+                  {chapter.list.map((item) => (
+                    <li>{item}</li>
+                  ))}
+                </ul>
+              ) : (
+                <p class:list={{ pending: chapter.pending }}>{chapter.text}</p>
+              )}
             </section>
           ))
         }
@@ -273,6 +285,30 @@ const screenshots = project.screenshots ?? [];
     color: var(--muted);
   }
 
+  .features {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem 2.5rem;
+    max-width: 46rem;
+  }
+
+  .features li {
+    position: relative;
+    padding-left: 1.4rem;
+    line-height: 1.45;
+  }
+
+  .features li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.55em;
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 50%;
+    background: var(--lime);
+  }
+
   .empty {
     padding: 2rem;
     border-radius: var(--r-m);
@@ -365,7 +401,8 @@ const screenshots = project.screenshots ?? [];
   @media (max-width: 800px) {
     .meta,
     .chapter,
-    .after {
+    .after,
+    .features {
       grid-template-columns: 1fr;
     }
 

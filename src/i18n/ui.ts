@@ -54,7 +54,7 @@ const de = {
     placeholderNote: 'Platzhalter-Grafik',
   },
   status: {
-    live: 'Veröffentlicht',
+    completed: 'Abgeschlossen',
     'in-development': 'In Entwicklung',
     prototype: 'Prototyp',
     planned: 'Geplant',
@@ -64,6 +64,7 @@ const de = {
     status: 'Status',
     links: 'Links',
     overview: 'Überblick',
+    features: 'Funktionen',
     problem: 'Problem',
     solution: 'Lösung',
     implementation: 'Technische Umsetzung',
@@ -212,7 +213,7 @@ const en: Dictionary = {
     placeholderNote: 'Placeholder artwork',
   },
   status: {
-    live: 'Released',
+    completed: 'Completed',
     'in-development': 'In development',
     prototype: 'Prototype',
     planned: 'Planned',
@@ -222,6 +223,7 @@ const en: Dictionary = {
     status: 'Status',
     links: 'Links',
     overview: 'Overview',
+    features: 'Features',
     problem: 'Problem',
     solution: 'Solution',
     implementation: 'Technical implementation',
