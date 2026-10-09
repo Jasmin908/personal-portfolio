@@ -1,0 +1,66 @@
+---
+import { localeCodes, locales, type Locale } from '../i18n/config';
+import { useTranslations } from '../i18n/ui';
+
+interface Props {
+  locale: Locale;
+  alternates: Record<Locale, string>;
+}
+
+const { locale, alternates } = Astro.props;
+const t = useTranslations(locale);
+---
+
+<ul class="lang" aria-label={t.nav.language}>
+  {
+    localeCodes.map((code) => (
+      <li>
+        <a
+          href={alternates[code]}
+          hreflang={locales[code].htmlLang}
+          lang={locales[code].htmlLang}
+          data-lang={code}
+          aria-current={code === locale ? 'true' : undefined}
+        >
+          <span aria-hidden="true">{locales[code].label}</span>
+          <span class="visually-hidden">{locales[code].name}</span>
+        </a>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .lang {
+    display: flex;
+    padding: 3px;
+    border-radius: var(--pill);
+    background: rgb(255 255 255 / 0.06);
+    border: 1px solid var(--line);
+  }
+
+  a {
+    display: grid;
+    place-items: center;
+    min-width: 2.5rem;
+    height: 2rem;
+    padding-inline: 0.6rem;
+    border-radius: var(--pill);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    transition:
+      color 0.3s var(--ease),
+      background-color 0.3s var(--ease);
+  }
+
+  a:hover {
+    color: var(--text);
+  }
+
+  a[aria-current] {
+    background: var(--text);
+    color: var(--ink);
+  }
+</style>

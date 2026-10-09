@@ -1,0 +1,251 @@
+---
+import LangSwitch from './LangSwitch.astro';
+import Logo from './Logo.astro';
+import { homePath, sectionPath, type Locale } from '../i18n/config';
+import { useTranslations } from '../i18n/ui';
+import { site } from '../data/site';
+
+interface Props {
+  locale: Locale;
+  alternates: Record<Locale, string>;
+  activeNav?: string;
+}
+
+const { locale, alternates, activeNav } = Astro.props;
+const t = useTranslations(locale);
+
+// Section ids are the same in every language, so anchors survive a switch.
+const items = [
+  { id: 'projects', label: t.nav.projects },
+  { id: 'about', label: t.nav.about },
+  { id: 'skills', label: t.nav.skills },
+  { id: 'contact', label: t.nav.contact },
+];
+---
+
+<header class="nav">
+  <nav class="bar" aria-label={t.nav.label}>
+    <a class="wordmark" href={homePath(locale)} aria-label={`${site.name} – ${t.nav.home}`}>
+      <Logo />
+    </a>
+
+    <ul class="links" data-nav-list>
+      <li class="indicator" data-nav-indicator aria-hidden="true"></li>
+      {
+        items.map((item) => (
+          <li>
+            <a
+              href={sectionPath(locale, item.id)}
+              data-nav={item.id}
+              aria-current={activeNav === item.id ? 'page' : undefined}
+            >
+              {item.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+
+    <div class="end">
+      <LangSwitch locale={locale} alternates={alternates} />
+      <button
+        class="menu-button"
+        type="button"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+        aria-label={t.nav.menuOpen}
+        data-label-open={t.nav.menuOpen}
+        data-label-close={t.nav.menuClose}
+        data-menu-button
+      >
+        <span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <div class="menu" id="mobile-menu" data-menu hidden>
+    <ul>
+      {
+        items.map((item, index) => (
+          <li>
+            <a href={sectionPath(locale, item.id)}>
+              <span class="num">0{index + 1}</span>
+              {item.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</header>
+
+<style>
+  .nav {
+    position: fixed;
+    top: 1rem;
+    left: 50%;
+    z-index: 50;
+    width: min(100% - 2rem, 46rem);
+    transform: translateX(-50%);
+  }
+
+  .bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    height: var(--nav-h);
+    padding: 0 0.5rem 0 1.25rem;
+    border-radius: var(--pill);
+    border: 1px solid var(--line);
+    background: rgb(20 19 32 / 0.72);
+    backdrop-filter: blur(18px) saturate(1.4);
+    -webkit-backdrop-filter: blur(18px) saturate(1.4);
+    box-shadow: 0 12px 40px -18px rgb(0 0 0 / 0.8);
+  }
+
+  .wordmark {
+    flex: none;
+    margin-left: -0.5rem;
+    border-radius: 9px;
+  }
+
+  .links {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .links a {
+    position: relative;
+    z-index: 1;
+    display: block;
+    padding: 0.5rem 0.95rem;
+    font-size: 0.9375rem;
+    color: var(--muted);
+    border-radius: var(--pill);
+    transition: color 0.3s var(--ease);
+  }
+
+  .links a:hover,
+  .links a[aria-current] {
+    color: var(--text);
+  }
+
+  /* Pill that slides behind the hovered or active link (positioned by JS). */
+  .indicator {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 0;
+    border-radius: var(--pill);
+    background: rgb(255 255 255 / 0.09);
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      transform 0.5s var(--ease),
+      width 0.5s var(--ease),
+      opacity 0.3s var(--ease);
+  }
+
+  .end {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .menu-button {
+    display: none;
+    position: relative;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background: rgb(255 255 255 / 0.06);
+    border: 1px solid var(--line);
+  }
+
+  .menu-button span {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 1rem;
+    height: 1.5px;
+    background: var(--text);
+    transition: transform 0.4s var(--ease);
+  }
+
+  .menu-button span:first-child {
+    transform: translate(-50%, calc(-50% - 3px));
+  }
+
+  .menu-button span:last-child {
+    transform: translate(-50%, calc(-50% + 3px));
+  }
+
+  .menu-button[aria-expanded='true'] span:first-child {
+    transform: translate(-50%, -50%) rotate(45deg);
+  }
+
+  .menu-button[aria-expanded='true'] span:last-child {
+    transform: translate(-50%, -50%) rotate(-45deg);
+  }
+
+  .menu {
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    border-radius: var(--r-m);
+    border: 1px solid var(--line);
+    background: rgb(20 19 32 / 0.94);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    animation: menu-in 0.35s var(--ease);
+  }
+
+  .menu a {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    padding: 0.9rem 1rem;
+    border-radius: var(--r-s);
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+  }
+
+  .menu a:hover {
+    background: rgb(255 255 255 / 0.06);
+  }
+
+  .num {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    color: var(--violet-soft);
+  }
+
+  @keyframes menu-in {
+    from {
+      opacity: 0;
+      transform: translateY(-0.5rem);
+    }
+  }
+
+  @media (max-width: 760px) {
+    .links {
+      display: none;
+    }
+
+    .menu-button {
+      display: block;
+    }
+  }
+
+  @media (min-width: 761px) {
+    .menu {
+      display: none;
+    }
+  }
+</style>

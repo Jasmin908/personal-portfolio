@@ -1,0 +1,66 @@
+---
+import type { Project } from '../data/projects';
+import type { Locale } from '../i18n/config';
+import { useTranslations } from '../i18n/ui';
+
+/**
+ * Demo and repository links. A link that does not exist yet is rendered as
+ * plain text ("to follow"), never as a dead anchor.
+ */
+interface Props {
+  project: Project;
+  locale: Locale;
+}
+
+const { project, locale } = Astro.props;
+const t = useTranslations(locale);
+
+const links = [
+  { url: project.demoUrl, label: t.projects.demo, pending: t.projects.demoPending },
+  { url: project.repoUrl, label: t.projects.repo, pending: t.projects.repoPending },
+];
+---
+
+<ul class="links">
+  {
+    links.map((link) => (
+      <li>
+        {link.url ? (
+          <a href={link.url} target="_blank" rel="noopener noreferrer">
+            {link.label} <span aria-hidden="true">↗</span>
+          </a>
+        ) : (
+          <span class="pending">{link.pending}</span>
+        )}
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.25rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+  }
+
+  a {
+    position: relative;
+    z-index: 2;
+    color: var(--text);
+    border-bottom: 1px solid var(--line-strong);
+    transition: border-color 0.3s var(--ease);
+  }
+
+  a:hover {
+    border-color: var(--lime);
+  }
+
+  .pending {
+    color: var(--muted);
+    opacity: 0.75;
+  }
+</style>

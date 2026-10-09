@@ -1,0 +1,255 @@
+---
+import HeroOrbit from './HeroOrbit.astro';
+import Arrow from './Arrow.astro';
+import { sectionPath, type Locale } from '../i18n/config';
+import { useTranslations } from '../i18n/ui';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+---
+
+<section class="hero">
+  <div class="aurora" aria-hidden="true">
+    <span class="blob blob--violet"></span>
+    <span class="blob blob--blue"></span>
+    <span class="grid"></span>
+  </div>
+
+  <div class="container layout">
+    <div class="copy">
+      <p class="eyebrow" data-reveal>
+        <span class="dot"></span>{t.hero.eyebrow}
+      </p>
+      <p class="name" data-reveal style="--d: 60ms">{t.hero.name}</p>
+      <h1 data-reveal style="--d: 120ms">
+        {t.hero.titleLead}<br />
+        <span class="gradient-text">{t.hero.titleAccent}</span>
+      </h1>
+      <p class="intro" data-reveal style="--d: 200ms">{t.hero.intro}</p>
+      <div class="actions" data-reveal style="--d: 280ms">
+        <a class="btn btn--primary" href={sectionPath(locale, 'projects')}>
+          {t.hero.ctaPrimary}<Arrow />
+        </a>
+        <a class="btn btn--ghost" href={sectionPath(locale, 'about')}>{t.hero.ctaSecondary}</a>
+      </div>
+    </div>
+
+    <div class="visual" data-reveal style="--d: 200ms">
+      <HeroOrbit />
+    </div>
+  </div>
+
+  <div class="container meta">
+    <span>{t.hero.metaLocation}</span>
+    <span class="focus">{t.hero.metaFocus}</span>
+    <span class="scroll">{t.hero.scroll} <i aria-hidden="true"></i></span>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    flex-direction: column;
+    min-height: 100svh;
+    padding-top: calc(var(--nav-h) + 4.5rem);
+    overflow: hidden;
+  }
+
+  /* ---------- Background ---------- */
+  .aurora {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+  }
+
+  .blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+    animation: drift 22s ease-in-out infinite alternate;
+  }
+
+  .blob--violet {
+    width: 46rem;
+    height: 34rem;
+    right: -12rem;
+    top: -6rem;
+    background: rgb(139 92 246 / 0.38);
+  }
+
+  .blob--blue {
+    width: 38rem;
+    height: 30rem;
+    left: -16rem;
+    bottom: -14rem;
+    background: rgb(59 130 246 / 0.24);
+    animation-duration: 28s;
+    animation-direction: alternate-reverse;
+  }
+
+  .grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgb(255 255 255 / 0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(255 255 255 / 0.035) 1px, transparent 1px);
+    background-size: 4.5rem 4.5rem;
+    mask-image: radial-gradient(ellipse 80% 70% at 60% 40%, #000, transparent);
+    -webkit-mask-image: radial-gradient(ellipse 80% 70% at 60% 40%, #000, transparent);
+  }
+
+  @keyframes drift {
+    to {
+      transform: translate3d(-5rem, 3rem, 0) scale(1.12);
+    }
+  }
+
+  /* ---------- Content ---------- */
+  .layout {
+    flex: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.5rem 1rem;
+    border-radius: var(--pill);
+    border: 1px solid var(--line-strong);
+    background: rgb(255 255 255 / 0.04);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    line-height: 1.4;
+    color: var(--text);
+  }
+
+  .dot {
+    flex: none;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--lime);
+    box-shadow: 0 0 0 4px rgb(182 243 106 / 0.18);
+  }
+
+  .name {
+    margin-top: 2rem;
+    font-family: var(--font-display);
+    font-size: clamp(1.1rem, 1.8vw, 1.4rem);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    color: var(--muted);
+  }
+
+  h1 {
+    margin-top: 0.5rem;
+    font-size: clamp(3.1rem, 9.2vw, 7.75rem);
+    font-weight: 800;
+    line-height: 0.92;
+    letter-spacing: -0.05em;
+  }
+
+  /* Room for descenders, which background-clip would otherwise cut off. */
+  h1 .gradient-text {
+    display: inline-block;
+    padding-bottom: 0.12em;
+  }
+
+  .intro {
+    max-width: 34rem;
+    margin-top: 1.5rem;
+    font-size: clamp(1.05rem, 1.5vw, 1.2rem);
+    color: var(--muted);
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 2.25rem;
+  }
+
+  .meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding-block: 1.5rem;
+    margin-top: 2.5rem;
+    border-top: 1px solid var(--line);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .scroll {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .scroll i {
+    width: 1px;
+    height: 1rem;
+    background: var(--lime);
+    animation: nudge 2.2s var(--ease) infinite;
+  }
+
+  @keyframes nudge {
+    50% {
+      transform: translateY(5px);
+    }
+  }
+
+  @media (max-width: 900px) {
+    .hero {
+      padding-top: calc(var(--nav-h) + 3rem);
+    }
+
+    .layout {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+
+    .blob--violet {
+      width: 28rem;
+      height: 24rem;
+      top: -8rem;
+    }
+
+    /* The object moves behind the text instead of taking a row of its own. */
+    .visual {
+      position: absolute;
+      top: 5rem;
+      right: -9rem;
+      width: 26rem;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    /* Dimmed on the inner element; the reveal animation owns .visual's opacity. */
+    .visual :global(.orbit) {
+      opacity: 0.4;
+    }
+
+    .visual :global(.chip) {
+      display: none;
+    }
+
+    .focus {
+      display: none;
+    }
+  }
+</style>

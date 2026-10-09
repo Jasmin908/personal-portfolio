@@ -1,0 +1,177 @@
+---
+import type { Locale } from '../i18n/config';
+import { useTranslations } from '../i18n/ui';
+import { site } from '../data/site';
+import type { IconName } from '../data/icons';
+import SkillIcon from './SkillIcon.astro';
+
+interface Props {
+  locale: Locale;
+}
+
+const t = useTranslations(Astro.props.locale);
+const { email, github, linkedin } = site.contact;
+
+const display = (url: string | null) => url?.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
+
+// A channel without a value in src/data/site.ts is left out.
+const channels = [
+  { icon: 'mail', label: t.contact.email, href: email && `mailto:${email}`, text: email, external: false },
+  { icon: 'branch', label: t.contact.github, href: github, text: display(github), external: true },
+  { icon: 'person', label: t.contact.linkedin, href: linkedin, text: display(linkedin), external: true },
+].filter((channel) => channel.href) as {
+  icon: IconName;
+  label: string;
+  href: string;
+  text: string;
+  external: boolean;
+}[];
+---
+
+<section class="section contact" id="contact" aria-labelledby="contact-title">
+  <div class="glow" aria-hidden="true"></div>
+  <div class="container layout">
+    <div data-reveal>
+      <p class="label" data-index="05">{t.contact.label}</p>
+      <h2 id="contact-title">{t.contact.title}</h2>
+      <p class="text">{t.contact.text}</p>
+    </div>
+
+    <ul class="channels" data-reveal style="--d: 120ms">
+      {
+        channels.map((channel) => (
+          <li>
+            <a
+              href={channel.href}
+              target={channel.external ? '_blank' : undefined}
+              rel={channel.external ? 'noopener noreferrer' : undefined}
+            >
+              <SkillIcon name={channel.icon} />
+              <span class="detail">
+                <span class="channel">{channel.label}</span>
+                <span class="value">{channel.text}</span>
+              </span>
+              <span class="arrow" aria-hidden="true">
+                ↗
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .contact {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    border-top: 1px solid var(--line);
+  }
+
+  .glow {
+    position: absolute;
+    left: 50%;
+    bottom: -22rem;
+    z-index: -1;
+    width: 70rem;
+    height: 36rem;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgb(139 92 246 / 0.42), rgb(59 130 246 / 0.16) 60%, transparent);
+    filter: blur(40px);
+    transform: translateX(-50%);
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    align-items: end;
+    gap: 3rem 4rem;
+  }
+
+  h2 {
+    margin-top: 1.25rem;
+    font-size: clamp(2.75rem, 8vw, 6.5rem);
+    font-weight: 800;
+    line-height: 0.94;
+    letter-spacing: -0.05em;
+  }
+
+  .text {
+    max-width: 30rem;
+    margin-top: 1.75rem;
+    font-size: 1.125rem;
+    color: var(--muted);
+  }
+
+  .channels {
+    border-bottom: 1px solid var(--line-strong);
+  }
+
+  a {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 1rem;
+    padding-block: 1.1rem;
+    border-top: 1px solid var(--line-strong);
+  }
+
+  .detail {
+    display: grid;
+    grid-template-columns: 5rem 1fr;
+    align-items: baseline;
+    gap: 0.15rem 1rem;
+    min-width: 0;
+  }
+
+  .channel {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .value {
+    font-family: var(--font-display);
+    font-size: clamp(1.15rem, 2vw, 1.5rem);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    overflow-wrap: anywhere;
+    transition: color 0.3s var(--ease);
+  }
+
+  .arrow {
+    color: var(--lime);
+    transition: transform 0.4s var(--ease);
+  }
+
+  a:hover :global(.icon) {
+    background: rgb(139 92 246 / 0.24);
+    border-color: var(--violet-soft);
+    color: var(--text);
+  }
+
+  a:hover .arrow {
+    transform: translate(3px, -3px);
+  }
+
+  a:hover .value {
+    color: var(--violet-soft);
+  }
+
+  @media (max-width: 900px) {
+    .layout {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Narrow screens: label above the value, so the address fits on one line. */
+  @media (max-width: 560px) {
+    .detail {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

@@ -1,0 +1,250 @@
+---
+import SkillIcon from './SkillIcon.astro';
+import { skillGroups, tools } from '../data/skills';
+import type { Locale } from '../i18n/config';
+import { useTranslations } from '../i18n/ui';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+const number = (index: number) => String(index + 1).padStart(2, '0');
+---
+
+<section class="section" id="skills" aria-labelledby="skills-title">
+  <div class="container">
+    <header class="head" data-reveal>
+      <p class="label" data-index="03">{t.skills.label}</p>
+      <h2 class="h2" id="skills-title">{t.skills.title}</h2>
+      <p class="intro">{t.skills.intro}</p>
+    </header>
+
+    <div class="grid">
+      {
+        skillGroups.map((group, index) => (
+          <article class="card" data-spot data-reveal style={`--d: ${index * 70}ms`}>
+            <header class="card-head">
+              <SkillIcon name={group.icon} />
+              <span class="number" aria-hidden="true">
+                {number(index)}
+              </span>
+            </header>
+            <h3>{group.label[locale]}</h3>
+            <ul class="items">
+              {group.items.map((item) => (
+                <li>{item}</li>
+              ))}
+            </ul>
+          </article>
+        ))
+      }
+
+      <article class="card card--tools" data-spot data-reveal>
+        <div class="tools-head">
+          <header class="card-head">
+            <SkillIcon name={tools.icon} />
+            <span class="number" aria-hidden="true">
+              {number(skillGroups.length)}
+            </span>
+          </header>
+          <h3>{tools.label[locale]}</h3>
+        </div>
+
+        {
+          tools.subgroups.map((subgroup) => (
+            <div class="subgroup">
+              <h4>{subgroup.label[locale]}</h4>
+              <ul class="items">
+                {subgroup.items.map((item) => (
+                  <li>{item}</li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </article>
+    </div>
+  </div>
+</section>
+
+<style>
+  .head {
+    max-width: 44rem;
+  }
+
+  .h2 {
+    margin-top: 1.25rem;
+  }
+
+  .intro {
+    margin-top: 1.5rem;
+    color: var(--muted);
+  }
+
+  .grid {
+    --gap: clamp(0.75rem, 1.5vw, 1.25rem);
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--gap);
+    margin-top: clamp(2.5rem, 5vw, 4rem);
+  }
+
+  /* ---------- Card ---------- */
+  .card {
+    --pad: clamp(1.25rem, 2vw, 1.75rem);
+    position: relative;
+    padding: var(--pad);
+    border-radius: var(--r-m);
+    border: 1px solid var(--line);
+    background: rgb(27 26 42 / 0.55);
+    overflow: hidden;
+    /* Opacity and transform repeat the scroll-reveal timing from global.css. */
+    transition:
+      border-color 0.5s var(--ease),
+      opacity 0.9s var(--ease) var(--d, 0ms),
+      transform 0.9s var(--ease) var(--d, 0ms);
+  }
+
+  /* Soft light that follows the pointer (position set in site.ts). */
+  .card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(22rem circle at var(--mx, 50%) var(--my, 0%), rgb(139 92 246 / 0.14), transparent 60%);
+    opacity: 0;
+    transition: opacity 0.5s var(--ease);
+    pointer-events: none;
+  }
+
+  .card:hover {
+    border-color: rgb(196 181 253 / 0.4);
+  }
+
+  .card:hover::before {
+    opacity: 1;
+  }
+
+  .card:hover :global(.icon) {
+    background: rgb(139 92 246 / 0.24);
+    border-color: var(--violet-soft);
+    color: var(--text);
+  }
+
+  .card-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+
+  .number {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+  }
+
+  h3 {
+    margin-top: 1.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    line-height: 1.5;
+    text-transform: uppercase;
+    color: var(--violet-soft);
+  }
+
+  /* ---------- Technology list ---------- */
+  .items {
+    margin-top: 0.85rem;
+  }
+
+  .items li {
+    padding-block: 0.6rem;
+    border-top: 1px solid var(--line);
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.025em;
+  }
+
+  /* ---------- Tools: one wide card on the same four columns ---------- */
+  .card--tools {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    column-gap: var(--gap);
+    padding-inline: 0;
+  }
+
+  .card--tools > * {
+    padding-inline: var(--pad);
+  }
+
+  .subgroup {
+    border-left: 1px solid var(--line);
+  }
+
+  h4 {
+    margin: 0;
+    /* Two lines reserved, so the lists start level whatever the label length. */
+    min-height: 3em;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    line-height: 1.5;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .subgroup .items {
+    margin-top: 0.5rem;
+  }
+
+  .subgroup .items li {
+    font-size: 1.0625rem;
+  }
+
+  @media (max-width: 1000px) {
+    .grid,
+    .card--tools {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .card--tools {
+      row-gap: 1.75rem;
+    }
+
+    .tools-head {
+      grid-column: 1 / -1;
+    }
+
+    .subgroup:first-of-type {
+      border-left: 0;
+    }
+
+    .subgroup:last-of-type {
+      grid-column: 1 / -1;
+      border-left: 0;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .grid,
+    .card--tools {
+      grid-template-columns: 1fr;
+    }
+
+    .subgroup {
+      border-left: 0;
+    }
+
+    h4 {
+      min-height: 0;
+    }
+  }
+</style>

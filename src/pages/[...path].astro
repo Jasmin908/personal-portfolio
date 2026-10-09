@@ -1,0 +1,37 @@
+---
+/**
+ * The one route that produces every page in every language:
+ *
+ *   /                       home, German (default)
+ *   /en/                    home, English
+ *   /projekte/<slug>/       project, German
+ *   /en/projects/<slug>/    project, English
+ *
+ * The URLs come from src/i18n/config.ts, so a new language or a new project
+ * needs no additional page file.
+ */
+import type { GetStaticPaths } from 'astro';
+import HomeView from '../views/HomeView.astro';
+import ProjectView from '../views/ProjectView.astro';
+import { projects, type Project } from '../data/projects';
+import { homePath, localeCodes, projectPath, type Locale } from '../i18n/config';
+
+type Props = { locale: Locale; project?: Project };
+
+export const getStaticPaths = (() => {
+  // Astro expects the path without leading or trailing slash; '/' becomes undefined.
+  const toParam = (path: string) => path.replace(/^\/|\/$/g, '') || undefined;
+
+  return localeCodes.flatMap((locale) => [
+    { params: { path: toParam(homePath(locale)) }, props: { locale } as Props },
+    ...projects.map((project) => ({
+      params: { path: toParam(projectPath(locale, project.slug)) },
+      props: { locale, project } as Props,
+    })),
+  ]);
+}) satisfies GetStaticPaths;
+
+const { locale, project } = Astro.props as Props;
+---
+
+{project ? <ProjectView locale={locale} project={project} /> : <HomeView locale={locale} />}

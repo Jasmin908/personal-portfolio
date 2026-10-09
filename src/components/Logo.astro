@@ -1,0 +1,42 @@
+---
+// JL monogram: geometric initials in a thin rounded-square frame.
+// public/favicon.svg is the same mark with heavier strokes for 16px.
+---
+
+<svg class="logo" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+  <rect class="frame" x="1.25" y="1.25" width="29.5" height="29.5" rx="8.5"></rect>
+  <path class="letters" d="M14.25 9.25v9a4 4 0 0 1-4 4H8.75M18.5 9.25v13H24"></path>
+  <circle class="accent" cx="23.5" cy="10" r="1.75"></circle>
+</svg>
+
+<style>
+  .logo {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .frame {
+    fill: rgb(139 92 246 / 0.1);
+    stroke: var(--violet);
+    stroke-width: 1.25;
+    transition:
+      stroke 0.4s var(--ease),
+      fill 0.4s var(--ease);
+  }
+
+  .letters {
+    stroke: var(--text);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .accent {
+    fill: var(--lime);
+  }
+
+  :global(a:hover) > .logo .frame {
+    fill: rgb(139 92 246 / 0.22);
+    stroke: var(--violet-soft);
+  }
+</style>

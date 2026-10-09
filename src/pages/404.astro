@@ -1,0 +1,77 @@
+---
+import '@fontsource-variable/bricolage-grotesque';
+import '@fontsource-variable/geist';
+import '../styles/global.css';
+import { homePath, localeCodes, locales } from '../i18n/config';
+import { useTranslations } from '../i18n/ui';
+
+// Netlify serves this single file for every unknown URL, so it speaks all languages.
+---
+
+<!doctype html>
+<html lang="de-CH">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>404 – Jasmin Loeffel</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <main>
+      <p class="code" aria-hidden="true">404</p>
+      {
+        localeCodes.map((code) => {
+          const t = useTranslations(code);
+          return (
+            <section lang={locales[code].htmlLang}>
+              <h1>{t.notFound.title}</h1>
+              <p>{t.notFound.text}</p>
+              <a class="btn btn--ghost" href={homePath(code)}>
+                {t.notFound.cta}
+              </a>
+            </section>
+          );
+        })
+      }
+    </main>
+  </body>
+</html>
+
+<style>
+  main {
+    display: grid;
+    align-content: center;
+    gap: 2.5rem;
+    min-height: 100svh;
+    width: min(100% - 2.5rem, 40rem);
+    margin-inline: auto;
+    padding-block: 3rem;
+  }
+
+  .code {
+    font-family: var(--font-display);
+    font-size: clamp(5rem, 22vw, 11rem);
+    font-weight: 800;
+    line-height: 0.85;
+    letter-spacing: -0.06em;
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  section {
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line);
+  }
+
+  h1 {
+    font-size: 1.75rem;
+  }
+
+  section p {
+    margin-block: 0.5rem 1.25rem;
+    color: var(--muted);
+  }
+</style>

@@ -1,0 +1,215 @@
+---
+import ProjectCover from './ProjectCover.astro';
+import ProjectLinks from './ProjectLinks.astro';
+import StatusBadge from './StatusBadge.astro';
+import Arrow from './Arrow.astro';
+import type { Project } from '../data/projects';
+import { projectPath, type Locale } from '../i18n/config';
+import { useTranslations } from '../i18n/ui';
+
+interface Props {
+  project: Project;
+  locale: Locale;
+  index: number;
+}
+
+const { project, locale, index } = Astro.props;
+const t = useTranslations(locale);
+const number = String(index + 1).padStart(2, '0');
+const planned = project.status === 'planned';
+---
+
+<article class="card" data-spot data-reveal style={`--d: ${(index % 2) * 90}ms`}>
+  <div class="media">
+    <ProjectCover project={project} locale={locale} />
+    <div class="badge"><StatusBadge locale={locale} status={project.status} /></div>
+    <span class="number" aria-hidden="true">{number}</span>
+  </div>
+
+  <div class="body">
+    <p class="tagline">{project.tagline[locale]}</p>
+    <h3>
+      <a href={projectPath(locale, project.slug)}>{project.title[locale]}</a>
+    </h3>
+    <p class="summary">{project.summary[locale]}</p>
+
+    <ul class="stack" aria-label={planned ? t.projects.stackPlanned : t.projects.stack}>
+      {planned && project.stack.length > 0 && <li class="stack-note">{t.projects.stackPlannedShort}:</li>}
+      {project.stack.map((tech) => <li class:list={{ 'stack-planned': planned }}>{tech}</li>)}
+      {project.stack.length === 0 && <li class="stack-note">{t.projects.stackOpen}</li>}
+    </ul>
+
+    <div class="foot">
+      <span class="more">{t.projects.caseStudy}<Arrow /></span>
+      <ProjectLinks project={project} locale={locale} />
+    </div>
+  </div>
+</article>
+
+<style>
+  .card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--r-l);
+    border: 1px solid var(--line);
+    background: var(--surface);
+    overflow: hidden;
+    /* Opacity and transform repeat the scroll-reveal timing from global.css. */
+    transition:
+      border-color 0.5s var(--ease),
+      translate 0.6s var(--ease),
+      opacity 0.9s var(--ease) var(--d, 0ms),
+      transform 0.9s var(--ease) var(--d, 0ms);
+  }
+
+  /* Soft light that follows the pointer (position set in site.ts). */
+  .card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: radial-gradient(26rem circle at var(--mx, 50%) var(--my, 0%), rgb(139 92 246 / 0.16), transparent 60%);
+    opacity: 0;
+    transition: opacity 0.5s var(--ease);
+    pointer-events: none;
+  }
+
+  .card:hover,
+  .card:focus-within {
+    border-color: var(--line-strong);
+    translate: 0 -4px;
+  }
+
+  .card:hover::before {
+    opacity: 1;
+  }
+
+  .card:hover :global(.cover svg) {
+    transform: scale(1.05);
+  }
+
+  .media {
+    position: relative;
+    height: clamp(13rem, 24vw, 19rem);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .badge {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+  }
+
+  .number {
+    position: absolute;
+    right: 1.25rem;
+    bottom: 0.75rem;
+    font-family: var(--font-display);
+    font-size: 3.5rem;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.05em;
+    color: rgb(255 255 255 / 0.14);
+  }
+
+  .body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: clamp(1.5rem, 3vw, 2.25rem);
+  }
+
+  .tagline {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--violet-soft);
+  }
+
+  h3 {
+    margin-top: 0.75rem;
+    font-size: clamp(1.75rem, 3.2vw, 2.6rem);
+    line-height: 1.02;
+  }
+
+  /* The title link covers the whole card. */
+  h3 a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+
+  h3 a:focus-visible {
+    outline: none;
+  }
+
+  .card:has(h3 a:focus-visible) {
+    outline: 2px solid var(--lime);
+    outline-offset: 3px;
+  }
+
+  .summary {
+    margin-top: 0.9rem;
+    max-width: 36rem;
+    color: var(--muted);
+  }
+
+  .stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 1.5rem;
+  }
+
+  .stack li {
+    padding: 0.25rem 0.7rem;
+    border-radius: var(--pill);
+    border: 1px solid var(--line);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text);
+  }
+
+  /* Planned technologies: dashed outline, so they don't read as already in use. */
+  .stack .stack-planned {
+    border-style: dashed;
+    border-color: var(--line-strong);
+    color: var(--muted);
+  }
+
+  .stack .stack-note {
+    padding-inline: 0;
+    border-color: transparent;
+    color: var(--muted);
+  }
+
+  .foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem 1.5rem;
+    margin-top: auto;
+    padding-top: 1.75rem;
+  }
+
+  .more {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 560;
+  }
+
+  .more :global(svg) {
+    width: 1rem;
+    height: 1rem;
+    transition: transform 0.4s var(--ease);
+  }
+
+  .card:hover .more :global(svg) {
+    transform: translateX(5px);
+  }
+</style>

@@ -1,0 +1,211 @@
+---
+import type { Locale } from '../i18n/config';
+import { useTranslations } from '../i18n/ui';
+
+interface Props {
+  locale: Locale;
+}
+
+const t = useTranslations(Astro.props.locale);
+---
+
+<section class="section about" id="about" aria-labelledby="about-title">
+  <div class="container layout">
+    <div class="side" data-reveal>
+      <p class="label" data-index="02">{t.about.label}</p>
+      <h2 id="about-title">{t.about.title}</h2>
+    </div>
+
+    <div class="main">
+      <p class="lead" data-reveal>{t.about.lead}</p>
+      <div class="text" data-reveal style="--d: 80ms">
+        {t.about.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+      </div>
+
+      <dl class="facts" data-reveal style="--d: 140ms">
+        {
+          t.about.facts.map((fact) => (
+            <div>
+              <dt>{fact.term}</dt>
+              <dd>{fact.value}</dd>
+            </div>
+          ))
+        }
+      </dl>
+
+      <div class="languages" data-reveal style="--d: 200ms">
+        <h3>{t.about.languages.title}</h3>
+        <ul>
+          {
+            t.about.languages.items.map((language) => (
+              <li>
+                {language.name}
+                <span>{language.level}</span>
+              </li>
+            ))
+          }
+        </ul>
+        <p class="learning"><i aria-hidden="true"></i>{t.about.languages.learning}</p>
+        <p class="note">{t.about.languages.note}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .about {
+    border-block: 1px solid var(--line);
+    background: linear-gradient(180deg, rgb(27 26 42 / 0.5), transparent);
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+    gap: 2rem 4rem;
+  }
+
+  .side {
+    position: sticky;
+    top: calc(var(--nav-h) + 3rem);
+    align-self: start;
+  }
+
+  h2 {
+    margin-top: 1.25rem;
+    font-size: clamp(1.5rem, 2.4vw, 2rem);
+    font-weight: 600;
+    line-height: 1.1;
+    color: var(--muted);
+  }
+
+  /* The statement is the visual centre of this section, not a heading. */
+  .lead {
+    font-family: var(--font-display);
+    font-size: clamp(1.7rem, 3.9vw, 3.1rem);
+    font-weight: 600;
+    line-height: 1.12;
+    letter-spacing: -0.035em;
+  }
+
+  .text {
+    display: grid;
+    gap: 1.25rem;
+    max-width: 40rem;
+    margin-top: 2.5rem;
+    color: var(--muted);
+    font-size: 1.125rem;
+  }
+
+  .facts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 2.5rem;
+    margin-top: 3.5rem;
+  }
+
+  .facts div {
+    padding-block: 1.1rem;
+    border-top: 1px solid var(--line);
+  }
+
+  dt {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  dd {
+    margin-top: 0.35rem;
+    font-weight: 500;
+  }
+
+  .languages {
+    padding-top: 1.1rem;
+    border-top: 1px solid var(--line);
+  }
+
+  h3 {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 400;
+    letter-spacing: 0.12em;
+    line-height: 1.6;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .languages ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.9rem;
+  }
+
+  .languages li {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.15rem 0.6rem;
+    padding: 0.4rem 0.9rem;
+    border-radius: var(--pill);
+    border: 1px solid var(--line-strong);
+    background: rgb(255 255 255 / 0.03);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+
+  .languages li span {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 400;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--violet-soft);
+  }
+
+  .learning {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    margin-top: 1.1rem;
+    font-size: 0.9375rem;
+    color: var(--muted);
+  }
+
+  .learning i {
+    flex: none;
+    width: 0.4rem;
+    height: 0.4rem;
+    border-radius: 50%;
+    background: var(--lime);
+    translate: 0 -0.1em;
+  }
+
+  .note {
+    margin-top: 0.4rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    opacity: 0.8;
+  }
+
+  @media (max-width: 900px) {
+    .layout {
+      grid-template-columns: 1fr;
+    }
+
+    .side {
+      position: static;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .facts {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

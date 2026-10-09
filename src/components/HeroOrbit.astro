@@ -1,0 +1,143 @@
+---
+// Decorative hero object: a glass sphere with three tilted orbits.
+// Pure CSS, no images and no JavaScript.
+---
+
+<div class="orbit" aria-hidden="true">
+  <div class="halo"></div>
+  <div class="plane">
+    <div class="ring ring--1"><i></i></div>
+    <div class="ring ring--2"><i></i></div>
+    <div class="ring ring--3"><i></i></div>
+  </div>
+  <div class="sphere"></div>
+  <span class="chip chip--a">&lt;/&gt;</span>
+  <span class="chip chip--b">01</span>
+</div>
+
+<style>
+  .orbit {
+    position: relative;
+    width: min(100%, 34rem);
+    aspect-ratio: 1;
+    margin-inline: auto;
+  }
+
+  .halo {
+    position: absolute;
+    inset: 8%;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgb(139 92 246 / 0.4), rgb(59 130 246 / 0.16) 55%, transparent);
+    filter: blur(30px);
+  }
+
+  .sphere {
+    position: absolute;
+    inset: 27%;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 30% 26%, rgb(255 255 255 / 0.85), transparent 22%),
+      radial-gradient(circle at 72% 80%, rgb(182 243 106 / 0.28), transparent 38%),
+      radial-gradient(circle at 34% 30%, #c4b5fd, #8b5cf6 34%, #3b82f6 62%, #15132b 88%);
+    box-shadow:
+      inset -1.25rem -1.75rem 3.5rem rgb(8 7 20 / 0.7),
+      0 2rem 5rem -1rem rgb(99 76 240 / 0.6);
+    animation: float 9s ease-in-out infinite;
+  }
+
+  /* The rings share one tilted plane so they read as a single system. */
+  .plane {
+    position: absolute;
+    inset: 0;
+    transform: rotateX(68deg) rotateZ(-18deg);
+    transform-style: preserve-3d;
+  }
+
+  .ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 1.5px solid rgb(255 255 255 / 0.3);
+    animation: spin linear infinite;
+  }
+
+  .ring--1 {
+    inset: 12%;
+    animation-duration: 18s;
+  }
+
+  .ring--2 {
+    inset: 0%;
+    border-style: dashed;
+    border-color: rgb(196 181 253 / 0.45);
+    animation-duration: 34s;
+    animation-direction: reverse;
+  }
+
+  .ring--3 {
+    inset: -14%;
+    border-color: rgb(255 255 255 / 0.16);
+    animation-duration: 52s;
+  }
+
+  .ring i {
+    position: absolute;
+    top: 50%;
+    left: -0.4rem;
+    width: 0.8rem;
+    height: 0.8rem;
+    border-radius: 50%;
+    background: var(--violet-soft);
+    box-shadow: 0 0 1rem var(--violet);
+  }
+
+  .ring--2 i {
+    background: var(--lime);
+    box-shadow: 0 0 1rem rgb(182 243 106 / 0.7);
+  }
+
+  .ring--3 i {
+    width: 0.55rem;
+    height: 0.55rem;
+    background: var(--blue);
+    box-shadow: 0 0 1rem var(--blue);
+  }
+
+  .chip {
+    position: absolute;
+    padding: 0.45rem 0.8rem;
+    border-radius: var(--pill);
+    border: 1px solid var(--line-strong);
+    background: rgb(27 26 42 / 0.6);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    color: var(--text);
+    animation: float 7s ease-in-out infinite;
+  }
+
+  .chip--a {
+    top: 16%;
+    right: 10%;
+  }
+
+  .chip--b {
+    bottom: 18%;
+    left: 8%;
+    color: var(--lime);
+    animation-delay: -3s;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes float {
+    50% {
+      transform: translateY(-0.9rem);
+    }
+  }
+</style>

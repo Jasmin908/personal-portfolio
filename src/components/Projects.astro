@@ -1,0 +1,81 @@
+---
+import ProjectCard from './ProjectCard.astro';
+import { projects } from '../data/projects';
+import type { Locale } from '../i18n/config';
+import { useTranslations } from '../i18n/ui';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+---
+
+<section class="section" id="projects" aria-labelledby="projects-title">
+  <div class="container">
+    <header class="head">
+      <div data-reveal>
+        <p class="label" data-index="01">{t.projects.label}</p>
+        <h2 class="h2" id="projects-title">{t.projects.title}</h2>
+      </div>
+      <p class="intro" data-reveal style="--d: 100ms">{t.projects.intro}</p>
+    </header>
+
+    <div class="grid">
+      {projects.map((project, index) => <ProjectCard project={project} locale={locale} index={index} />)}
+    </div>
+  </div>
+</section>
+
+<style>
+  .head {
+    display: grid;
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+    align-items: end;
+    gap: 1.5rem 3rem;
+    margin-bottom: clamp(2.5rem, 5vw, 4rem);
+  }
+
+  .h2 {
+    margin-top: 1.25rem;
+  }
+
+  .intro {
+    color: var(--muted);
+    max-width: 28rem;
+    justify-self: end;
+  }
+
+  /* Alternating wide and narrow cards: 7/5, then 5/7, and so on. */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: clamp(1rem, 2vw, 1.5rem);
+  }
+
+  .grid > :global(*) {
+    grid-column: span 7;
+  }
+
+  .grid > :global(:nth-child(4n + 2)),
+  .grid > :global(:nth-child(4n + 3)) {
+    grid-column: span 5;
+  }
+
+  @media (max-width: 900px) {
+    .head {
+      grid-template-columns: 1fr;
+    }
+
+    .intro {
+      justify-self: start;
+    }
+
+    .grid > :global(*),
+    .grid > :global(:nth-child(4n + 2)),
+    .grid > :global(:nth-child(4n + 3)) {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

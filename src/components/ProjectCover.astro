@@ -1,0 +1,207 @@
+---
+import { Image } from 'astro:assets';
+import type { Project } from '../data/projects';
+import type { Locale } from '../i18n/config';
+
+/**
+ * Preview area of a project. Shows the real image when the project has one,
+ * otherwise an abstract generated motif that is clearly not a screenshot.
+ */
+interface Props {
+  project: Project;
+  locale: Locale;
+  /** Hint for responsive image sizes. */
+  sizes?: string;
+  eager?: boolean;
+}
+
+const { project, locale, sizes = '(min-width: 900px) 50vw, 100vw', eager = false } = Astro.props;
+
+// Deterministic pseudo-random numbers, so the artwork is identical on every build.
+function seeded(seed: number) {
+  let value = seed;
+  return () => {
+    value = (value * 9301 + 49297) % 233280;
+    return value / 233280;
+  };
+}
+
+const random = seeded(project.slug.length * 97 + 13);
+
+// grid: a contribution-style field of cells
+const cells = Array.from({ length: 7 * 20 }, (_, i) => ({
+  x: 40 + (i % 20) * 28,
+  y: 96 + Math.floor(i / 20) * 28,
+  level: Math.floor(random() * 5),
+}));
+
+// timeline: blocks spread over seven columns
+const blocks = Array.from({ length: 7 }, (_, col) =>
+  Array.from({ length: 2 + Math.floor(random() * 2) }, (_, row) => ({
+    x: 48 + col * 80,
+    y: 70 + row * 96 + Math.floor(random() * 30),
+    h: 44 + Math.floor(random() * 40),
+    tone: Math.floor(random() * 3),
+  })),
+).flat();
+
+// dialog: code-like lines of varying length
+const lines = Array.from({ length: 8 }, (_, i) => ({
+  y: 96 + i * 30,
+  indent: [0, 24, 48, 48, 24, 48, 24, 0][i],
+  width: 90 + Math.floor(random() * 150),
+}));
+---
+
+<div class="cover" data-accent={project.accent}>
+  {
+    project.image ? (
+      <Image
+        src={project.image}
+        alt={project.imageAlt?.[locale] ?? ''}
+        widths={[480, 800, 1200]}
+        sizes={sizes}
+        loading={eager ? 'eager' : 'lazy'}
+      />
+    ) : (
+      <svg viewBox="0 0 640 400" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        {project.cover === 'grid' &&
+          cells.map((cell) => (
+            <rect x={cell.x} y={cell.y} width="20" height="20" rx="5" class={`l${cell.level}`} />
+          ))}
+
+        {project.cover === 'dialog' && (
+          <>
+            <rect x="48" y="56" width="360" height="296" rx="18" class="panel" />
+            <circle cx="74" cy="78" r="4" class="l1" />
+            <circle cx="90" cy="78" r="4" class="l1" />
+            <circle cx="106" cy="78" r="4" class="l1" />
+            {lines.map((line, i) => (
+              <rect
+                x={76 + line.indent}
+                y={line.y + 14}
+                width={line.width}
+                height="8"
+                rx="4"
+                class={i === 3 ? 'l4' : 'l2'}
+              />
+            ))}
+            <rect x="372" y="150" width="220" height="120" rx="18" class="bubble" />
+            <rect x="396" y="178" width="150" height="8" rx="4" class="ink" />
+            <rect x="396" y="200" width="172" height="8" rx="4" class="ink" />
+            <rect x="396" y="222" width="96" height="8" rx="4" class="ink" />
+          </>
+        )}
+
+        {project.cover === 'timeline' && (
+          <>
+            {Array.from({ length: 7 }, (_, col) => (
+              <line x1={40 + col * 80} y1="40" x2={40 + col * 80} y2="360" class="rule" />
+            ))}
+            {blocks.map((block) => (
+              <rect x={block.x} y={block.y} width="64" height={block.h} rx="10" class={`t${block.tone}`} />
+            ))}
+          </>
+        )}
+
+        {project.cover === 'scan' && (
+          <>
+            {[150, 112, 74, 36].map((r) => (
+              <circle cx="320" cy="200" r={r} class="ringline" />
+            ))}
+            <path d="M320 200 L320 50 A150 150 0 0 1 450 125 Z" class="sweep" />
+            <circle cx="398" cy="134" r="7" class="l4" />
+            <circle cx="252" cy="262" r="5" class="l3" />
+            <circle cx="350" cy="278" r="5" class="l3" />
+            <rect x="48" y="230" width="56" height="56" rx="12" class="l4" />
+            <rect x="116" y="230" width="56" height="56" rx="12" class="l1" />
+          </>
+        )}
+      </svg>
+    )
+  }
+</div>
+
+<style>
+  .cover {
+    --c: var(--violet);
+    --c-soft: var(--violet-soft);
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background:
+      radial-gradient(120% 90% at 85% 0%, color-mix(in srgb, var(--c) 42%, transparent), transparent 62%),
+      linear-gradient(160deg, #201e36, #12111e);
+  }
+
+  [data-accent='blue'] {
+    --c: var(--blue);
+    --c-soft: #93c5fd;
+  }
+
+  [data-accent='lime'] {
+    --c: var(--lime);
+    --c-soft: #dcf9b6;
+  }
+
+  svg,
+  .cover :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  svg {
+    transition: transform 1.2s var(--ease);
+  }
+
+  /* Intensity scale shared by the motifs. */
+  .l0 {
+    fill: rgb(255 255 255 / 0.05);
+  }
+  .l1 {
+    fill: rgb(255 255 255 / 0.12);
+  }
+  .l2 {
+    fill: color-mix(in srgb, var(--c) 40%, transparent);
+  }
+  .l3 {
+    fill: color-mix(in srgb, var(--c) 75%, transparent);
+  }
+  .l4 {
+    fill: var(--c-soft);
+  }
+
+  .panel {
+    fill: rgb(11 11 18 / 0.6);
+    stroke: rgb(255 255 255 / 0.12);
+  }
+  .bubble {
+    fill: var(--c);
+  }
+  .ink {
+    fill: rgb(11 11 18 / 0.55);
+  }
+
+  .rule {
+    stroke: rgb(255 255 255 / 0.08);
+  }
+  .t0 {
+    fill: rgb(255 255 255 / 0.1);
+  }
+  .t1 {
+    fill: color-mix(in srgb, var(--c) 45%, transparent);
+  }
+  .t2 {
+    fill: var(--c);
+  }
+
+  .ringline {
+    fill: none;
+    stroke: rgb(255 255 255 / 0.14);
+  }
+  .sweep {
+    fill: color-mix(in srgb, var(--c) 35%, transparent);
+  }
+</style>
