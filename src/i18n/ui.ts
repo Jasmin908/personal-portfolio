@@ -69,6 +69,7 @@ const de = {
     solution: 'Lösung',
     implementation: 'Technische Umsetzung',
     challenges: 'Herausforderungen',
+    limitations: 'Grenzen',
     learnings: 'Erkenntnisse',
     learningsPending:
       'Dieser Abschnitt wird ergänzt, sobald das Projekt weit genug ist, um ehrlich Bilanz zu ziehen.',
@@ -228,6 +229,7 @@ const en: Dictionary = {
     solution: 'Solution',
     implementation: 'Technical implementation',
     challenges: 'Challenges',
+    limitations: 'Limitations',
     learnings: 'Lessons learned',
     learningsPending:
       'This section will be added once the project is far enough along to take an honest look back.',

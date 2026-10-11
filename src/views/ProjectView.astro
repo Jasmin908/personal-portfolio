@@ -33,6 +33,8 @@ const chapters = [
   { title: t.project.solution, text: study.solution },
   { title: t.project.implementation, text: study.implementation },
   { title: t.project.challenges, text: study.challenges },
+  // Only for projects that describe their limits.
+  ...(study.limitations ? [{ title: t.project.limitations, text: study.limitations }] : []),
   { title: t.project.learnings, text: study.learnings ?? t.project.learningsPending, pending: !study.learnings },
 ];
 
