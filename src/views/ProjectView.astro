@@ -60,6 +60,13 @@ const screenshots = project.screenshots ?? [];
         <p class="tagline">{project.tagline[locale]}</p>
         <h1>{project.title[locale]}</h1>
         <p class="summary">{project.summary[locale]}</p>
+        {
+          project.demoUrl && project.demoLabel && (
+            <a class="btn btn--primary play" href={project.demoUrl} target="_blank" rel="noopener noreferrer">
+              {project.demoLabel[locale]} <span aria-hidden="true">↗</span>
+            </a>
+          )
+        }
 
         <dl class="meta">
           <div>
@@ -198,6 +205,10 @@ const screenshots = project.screenshots ?? [];
     margin-top: 1.75rem;
     font-size: clamp(1.1rem, 1.7vw, 1.3rem);
     color: var(--muted);
+  }
+
+  .play {
+    margin-top: 2rem;
   }
 
   .meta {

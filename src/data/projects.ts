@@ -5,6 +5,10 @@ import type { Localized } from '../i18n/config';
 import mentorExercises from '../assets/projects/ai-coding-mentor-exercises.webp';
 import mentorPractice from '../assets/projects/ai-coding-mentor-practice.webp';
 import mentorWorkspace from '../assets/projects/ai-coding-mentor-workspace.webp';
+import everboundBat from '../assets/projects/everbound-bat.webp';
+import everboundCave from '../assets/projects/everbound-cave.webp';
+import everboundGameplay from '../assets/projects/everbound-gameplay.webp';
+import everboundMenu from '../assets/projects/everbound-menu.webp';
 import habitflowCalendar from '../assets/projects/habitflow-calendar.webp';
 import habitflowDashboard from '../assets/projects/habitflow-dashboard.webp';
 import habitflowStatistics from '../assets/projects/habitflow-statistics.webp';
@@ -56,7 +60,11 @@ export interface Project {
   screenshots?: Screenshot[];
   stack: string[];
   demoUrl?: string;
+  /** Replaces the usual "Live demo" label and adds a prominent button on the detail page, e.g. "Play game". */
+  demoLabel?: Localized<string>;
   repoUrl?: string;
+  /** Set when no public repository is planned for now, so no "to follow" note is shown. */
+  hideRepo?: boolean;
   title: Localized<string>;
   tagline: Localized<string>;
   summary: Localized<string>;
@@ -251,6 +259,112 @@ export const projects: Project[] = [
           'The mentor is not an AI model and does not understand code. It recognises only a limited number of patterns, can miss real errors and can occasionally flag code that is fine. No code is executed anywhere. The requirement check therefore cannot tell whether a program works: a solution can contain every expected pattern and still be wrong, and a working solution written in an unusual way can be "not recognised". There is no progress tracking and there are no accounts, and the interface is available in English only.',
         learnings:
           'The project shows how much is gained by keeping logic and interface clearly apart: rules and exercises can be tested and extended one at a time without touching the presentation. It also shows where static checks end. Whether code really works can only be settled by running it. A learning tool should state that limit openly instead of suggesting certainty it does not have.',
+      },
+    },
+  },
+  {
+    slug: 'everbound',
+    status: 'prototype',
+    cover: 'grid',
+    accent: 'violet',
+    image: everboundGameplay,
+    imageAlt: {
+      de: 'Spielszene aus Everbound: Die Spielfigur sammelt Münzen auf einer Plattform über einem Stachelfeld, oben rechts die Herzanzeige und der Münzzähler',
+      en: 'Gameplay scene from Everbound: the player character collects coins on a platform above a field of spikes, with the hearts and coin counter in the top right',
+    },
+    screenshots: [
+      {
+        src: everboundMenu,
+        alt: {
+          de: 'Titelbild von Everbound mit Pixel-Art-Landschaft bei Nacht, Logo und dem Hinweis «Press here to start»',
+          en: 'Everbound title screen with a pixel-art landscape at night, the logo and the prompt "Press here to start"',
+        },
+      },
+      {
+        src: everboundBat,
+        alt: {
+          de: 'Spielszene aus Everbound: Die Spielfigur springt in der Höhle, links fliegt eine Fledermaus, rechts schweben Münzen',
+          en: 'Gameplay scene from Everbound: the player character jumps in the cave, with a bat flying on the left and coins floating on the right',
+        },
+      },
+      {
+        src: everboundCave,
+        alt: {
+          de: 'Spielszene aus Everbound: Die Spielfigur steht vor einem Stachelfeld, darüber Münzen und Kristalle an der Höhlendecke',
+          en: 'Gameplay scene from Everbound: the player character stands in front of a field of spikes, with coins above and crystals on the cave ceiling',
+        },
+      },
+    ],
+    stack: ['Godot 4.5', 'GDScript', '2D Game Development', 'Pixel Art'],
+    demoUrl: 'https://jasmin-everbound.netlify.app',
+    demoLabel: { de: 'Jetzt spielen', en: 'Play game' },
+    hideRepo: true,
+    title: { de: 'Everbound', en: 'Everbound' },
+    tagline: { de: '2D-Pixel-Art-Plattformer', en: '2D Pixel Art Platformer' },
+    summary: {
+      de: 'Ein Fantasy-Plattformer in Pixel-Art, entwickelt mit Godot: durch eine Höhle laufen und springen, Münzen sammeln, Gegnern und Fallen ausweichen und Kristallsplitter finden. Ein spielbarer Prototyp, der direkt im Browser läuft, mit Tastatur oder Touch.',
+      en: 'A fantasy platformer in pixel art, built with Godot: run and jump through a cave, collect coins, avoid enemies and traps, and find crystal shards. A playable prototype that runs directly in the browser, with keyboard or touch.',
+    },
+    features: {
+      de: [
+        'Laufen und Springen mit eigener Bewegungsphysik',
+        'Nahkampfangriff mit eigener Trefferzone',
+        'Lebenssystem mit Herzen, Rückstoss bei Treffern und Respawn',
+        'Sammelbare Münzen mit Zähler',
+        'Truhen, aus denen Kristallsplitter erscheinen',
+        'Gegner und Hindernisse wie Fledermäuse, Stacheln und Pfeile',
+        'Bewegliche Plattformen und Sprungfelder',
+        'Mitlaufende Kamera und Parallax-Hintergründe',
+        'Level-Übergänge mit Überblendung und Abschlussbildschirm mit Punktzahl',
+        'Hauptmenü und Einstellungen mit Lautstärkeregler',
+        'Steuerung per Tastatur oder Touch-Buttons',
+      ],
+      en: [
+        'Running and jumping with custom movement physics',
+        'A melee attack with its own hitbox',
+        'A health system with hearts, knockback when hit, and respawning',
+        'Collectible coins with a counter',
+        'Chests that release crystal shards',
+        'Enemies and hazards such as bats, spikes and arrows',
+        'Moving platforms and jump pads',
+        'A camera that follows the player, and parallax backgrounds',
+        'Level transitions with fades, and a completion screen with a score',
+        'A main menu and settings with a volume slider',
+        'Keyboard controls or on-screen touch buttons',
+      ],
+    },
+    caseStudy: {
+      de: {
+        overview:
+          'Everbound ist ein 2D-Plattformer mit Fantasy-Thema. Die Spielfigur läuft und springt durch eine Höhle, sammelt Münzen, weicht Gegnern und Fallen aus und findet Kristallsplitter. Das Projekt verbindet Programmierung, Leveldesign, Pixel-Art und Spielmechanik. Es ist ein spielbarer Prototyp und kein fertiges Spiel. Die Browser-Version ist veröffentlicht und lässt sich mit Tastatur oder Touch spielen.',
+        problem:
+          'Ein Plattformer wirkt einfach, besteht aber aus vielen Systemen, die zusammenpassen müssen: Bewegung, Kollisionen, Leben, Gegner, Sammelobjekte, Kamera, Menüs und Ton. Ziel des Projekts war, diese Systeme selbst umzusetzen und zu einem spielbaren Ganzen zu verbinden.',
+        solution:
+          'Die Spielfigur hat eine eigene Bewegungsphysik mit Schwerkraft und Sprung, einen Nahkampfangriff und drei Herzen. Bei einem Treffer wird sie zurückgestossen, ohne Herzen startet sie am Ausgangspunkt neu. In den Leveln liegen Münzen, die ein Zähler erfasst, und Truhen, aus denen Kristallsplitter erscheinen. Fledermäuse, Stacheln und Pfeile machen den Weg schwieriger, bewegliche Plattformen und Sprungfelder bringen Abwechslung. Am Ende eines Levels fasst ein Abschlussbildschirm Münzen, Zeit und Tode zu einer Punktzahl zusammen.',
+        implementation:
+          'Das Spiel ist mit Godot 4.5 und GDScript umgesetzt. Jedes Spielelement ist eine eigene Szene mit eigenem Skript, zum Beispiel Spielfigur, Münze, Truhe, Fledermaus oder Plattform. Die Level setzen diese Szenen zusammen und verwenden eine TileMap für das Gelände. Die Elemente sprechen über Signale und Gruppen miteinander: Ein Hindernis meldet eine Berührung, und die Spielfigur reagiert darauf. Die Spielfigur ist ein CharacterBody2D mit Animationen für Laufen, Springen, Angriff, Treffer und Tod. Übergänge zwischen Szenen und die Musik werden mit Tweens ein- und ausgeblendet. Für den Browser wird das Projekt als Web-Version exportiert; diese Veröffentlichung wurde mit Unterstützung von Claude Code vorbereitet.',
+        challenges:
+          'Die Browser-Version brauchte eigene Anpassungen. Ein «Quit»-Button ergibt in einem Browser-Tab keinen Sinn und liess das Spiel dort einfrieren; er wird in der Web-Version ausgeblendet. Ein Signal war doppelt verbunden, einmal im Editor und einmal im Skript, was beim Laden eines Levels Fehlermeldungen auslöste. Und die Touch-Buttons sollten auf dem Smartphone sichtbar sein, bei Tastaturbedienung aber nicht stören: Sie erscheinen nun auf Touch-Geräten und beim ersten Berühren des Bildschirms und verschwinden, sobald eine Taste gedrückt wird.',
+        limitations:
+          'Everbound ist ein Prototyp. In der Browser-Version wurde der Anfang des ersten Levels getestet; weitere Bereiche sind im Projekt angelegt, aber nicht vollständig geprüft, und ein drittes Level ist erst als leere Szene vorhanden. Das Spiel speichert keinen Fortschritt. Der erste Aufruf lädt rund 43 MB. Getestet wurde in einem Chromium-Browser; auf echten Smartphones und in anderen Browsern steht ein Test noch aus.',
+        learnings:
+          'Das Projekt zeigt, dass ein Spiel aus vielen kleinen Systemen besteht, die erst im Zusammenspiel Spass machen, und dass eigene Szenen pro Element diese Systeme überschaubar halten. Es zeigt auch, dass eine Veröffentlichung im Browser ein eigener Arbeitsschritt ist: Was auf dem Desktop funktioniert, muss dort noch einmal geprüft werden.',
+      },
+      en: {
+        overview:
+          'Everbound is a 2D platformer with a fantasy theme. The player character runs and jumps through a cave, collects coins, avoids enemies and traps, and finds crystal shards. The project combines programming, level design, pixel art and game mechanics. It is a playable prototype, not a finished game. The browser version is published and can be played with a keyboard or by touch.',
+        problem:
+          'A platformer looks simple but consists of many systems that have to fit together: movement, collisions, health, enemies, collectibles, camera, menus and sound. The aim of the project was to build these systems and connect them into something playable.',
+        solution:
+          'The player character has its own movement physics with gravity and jumping, a melee attack and three hearts. A hit knocks it back, and with no hearts left it restarts from the starting point. The levels contain coins, tracked by a counter, and chests that release crystal shards. Bats, spikes and arrows make the way harder, while moving platforms and jump pads add variety. At the end of a level, a completion screen combines coins, time and deaths into a score.',
+        implementation:
+          'The game is built with Godot 4.5 and GDScript. Every game element is its own scene with its own script, for example the player, a coin, a chest, a bat or a platform. Levels assemble these scenes and use a TileMap for the terrain. Elements talk to each other through signals and groups: a hazard reports a touch, and the player reacts to it. The player is a CharacterBody2D with animations for running, jumping, attacking, being hit and dying. Scene transitions and music fade in and out with tweens. For the browser, the project is exported as a web build; this release was prepared with assistance from Claude Code.',
+        challenges:
+          'The browser version needed adjustments of its own. A "Quit" button makes no sense in a browser tab and froze the game there, so it is hidden in the web build. One signal was connected twice, once in the editor and once in a script, which caused error messages whenever a level loaded. And the touch buttons had to be visible on a phone without getting in the way of keyboard play: they now appear on touch devices and on the first touch of the screen, and disappear as soon as a key is pressed.',
+        limitations:
+          'Everbound is a prototype. In the browser version, the beginning of the first level has been tested; further areas exist in the project but have not been fully checked, and a third level is only an empty scene so far. The game does not save progress. The first visit downloads about 43 MB. Testing was done in a Chromium browser; real phones and other browsers have not been tested yet.',
+        learnings:
+          'The project shows that a game consists of many small systems that only become fun together, and that giving each element its own scene keeps those systems manageable. It also shows that publishing in the browser is a step of its own: what works on the desktop has to be checked again there.',
       },
     },
   },

@@ -16,9 +16,9 @@ const { project, locale } = Astro.props;
 const t = useTranslations(locale);
 
 const links = [
-  { url: project.demoUrl, label: t.projects.demo, pending: t.projects.demoPending },
+  { url: project.demoUrl, label: project.demoLabel?.[locale] ?? t.projects.demo, pending: t.projects.demoPending },
   { url: project.repoUrl, label: t.projects.repo, pending: t.projects.repoPending },
-];
+].filter((link) => link.url || !(link.label === t.projects.repo && project.hideRepo));
 ---
 
 <ul class="links">
