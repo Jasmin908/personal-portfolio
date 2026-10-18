@@ -11,26 +11,42 @@ interface Props {
   project: Project;
   locale: Locale;
   index: number;
+  /** `compact` for the smaller cards under "More projects". */
+  size?: 'large' | 'compact';
+  /** A large card alone in its row: image and text side by side across the full width. */
+  wide?: boolean;
 }
 
-const { project, locale, index } = Astro.props;
+const { project, locale, index, size = 'large', wide = false } = Astro.props;
 const t = useTranslations(locale);
 const number = String(index + 1).padStart(2, '0');
 const planned = project.status === 'planned';
 ---
 
-<article class="card" data-spot data-reveal style={`--d: ${(index % 2) * 90}ms`}>
+<article
+  class:list={['card', `card--${size}`]}
+  data-spot
+  data-reveal
+  data-project-card
+  data-category={project.category}
+  data-wide={wide ? '' : undefined}
+  style={`--d: ${(index % 2) * 90}ms`}
+>
   <div class="media">
-    <ProjectCover project={project} locale={locale} />
+    <ProjectCover
+      project={project}
+      locale={locale}
+      sizes={size === 'compact' ? '(min-width: 1200px) 25vw, (min-width: 640px) 50vw, 100vw' : '(min-width: 900px) 50vw, 100vw'}
+    />
     <div class="badge"><StatusBadge locale={locale} status={project.status} /></div>
     <span class="number" aria-hidden="true">{number}</span>
   </div>
 
   <div class="body">
     <p class="tagline">{project.tagline[locale]}</p>
-    <h3>
+    <h4 class="title">
       <a href={projectPath(locale, project.slug)}>{project.title[locale]}</a>
-    </h3>
+    </h4>
     <p class="summary">{project.summary[locale]}</p>
 
     <ul class="stack" aria-label={planned ? t.projects.stackPlanned : t.projects.stack}>
@@ -129,25 +145,30 @@ const planned = project.status === 'planned';
     color: var(--violet-soft);
   }
 
-  h3 {
-    margin-top: 0.75rem;
+  /* An h4 (under the group heading), styled like the site's other display headings. */
+  .title {
+    margin: 0.75rem 0 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
     font-size: clamp(1.75rem, 3.2vw, 2.6rem);
     line-height: 1.02;
   }
 
   /* The title link covers the whole card. */
-  h3 a::after {
+  .title a::after {
     content: '';
     position: absolute;
     inset: 0;
     z-index: 1;
   }
 
-  h3 a:focus-visible {
+  .title a:focus-visible {
     outline: none;
   }
 
-  .card:has(h3 a:focus-visible) {
+  .card:has(.title a:focus-visible) {
     outline: 2px solid var(--lime);
     outline-offset: 3px;
   }
@@ -212,5 +233,59 @@ const planned = project.status === 'planned';
 
   .card:hover .more :global(svg) {
     transform: translateX(5px);
+  }
+
+  /* ---------- Compact: the smaller cards under "More projects" ---------- */
+  .card--compact {
+    border-radius: var(--r-m);
+  }
+
+  .card--compact .media {
+    height: clamp(10rem, 15vw, 12rem);
+  }
+
+  .card--compact .body {
+    padding: clamp(1.25rem, 2vw, 1.6rem);
+  }
+
+  .card--compact .title {
+    font-size: clamp(1.35rem, 2vw, 1.6rem);
+    line-height: 1.1;
+  }
+
+  .card--compact .summary {
+    font-size: 0.9375rem;
+  }
+
+  .card--compact .stack {
+    margin-top: 1.1rem;
+  }
+
+  .card--compact .foot {
+    padding-top: 1.25rem;
+  }
+
+  .card--compact .number {
+    font-size: 2.25rem;
+  }
+
+  /* ---------- Wide: a large card alone in its row ---------- */
+  @media (min-width: 901px) {
+    .card[data-wide] {
+      grid-column: 1 / -1;
+      flex-direction: row;
+    }
+
+    .card[data-wide] .media {
+      flex: 0 0 55%;
+      height: auto;
+      min-height: clamp(17rem, 26vw, 21rem);
+      border-bottom: 0;
+      border-right: 1px solid var(--line);
+    }
+
+    .card[data-wide] .body {
+      justify-content: center;
+    }
   }
 </style>

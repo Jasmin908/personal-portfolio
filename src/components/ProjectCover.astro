@@ -45,6 +45,13 @@ const blocks = Array.from({ length: 7 }, (_, col) =>
   })),
 ).flat();
 
+// terminal: prompt and output lines of a console window
+const consoleLines = Array.from({ length: 7 }, (_, i) => ({
+  y: 126 + i * 30,
+  prompt: i === 0 || i === 4,
+  width: 70 + Math.floor(random() * 230),
+}));
+
 // dialog: code-like lines of varying length
 const lines = Array.from({ length: 8 }, (_, i) => ({
   y: 96 + i * 30,
@@ -55,7 +62,18 @@ const lines = Array.from({ length: 8 }, (_, i) => ({
 
 <div class="cover" data-accent={project.accent}>
   {
-    project.image ? (
+    project.image && project.pixelArt ? (
+      // The original file, unchanged: resizing would blur the pixel edges.
+      <img
+        class="pixel"
+        src={project.image.src}
+        width={project.image.width}
+        height={project.image.height}
+        alt={project.imageAlt?.[locale] ?? ''}
+        loading={eager ? 'eager' : 'lazy'}
+        decoding="async"
+      />
+    ) : project.image ? (
       <Image
         src={project.image}
         alt={project.imageAlt?.[locale] ?? ''}
@@ -90,6 +108,23 @@ const lines = Array.from({ length: 8 }, (_, i) => ({
             <rect x="396" y="178" width="150" height="8" rx="4" class="ink" />
             <rect x="396" y="200" width="172" height="8" rx="4" class="ink" />
             <rect x="396" y="222" width="96" height="8" rx="4" class="ink" />
+          </>
+        )}
+
+        {project.cover === 'terminal' && (
+          <>
+            <rect x="72" y="52" width="496" height="296" rx="18" class="panel" />
+            <line x1="72" y1="96" x2="568" y2="96" class="rule" />
+            <circle cx="100" cy="74" r="5" class="l1" />
+            <circle cx="118" cy="74" r="5" class="l1" />
+            <circle cx="136" cy="74" r="5" class="l1" />
+            {consoleLines.map((line) => (
+              <>
+                {line.prompt && <path d={`M104 ${line.y - 6} l9 6 -9 6`} class="prompt" />}
+                <rect x={line.prompt ? 126 : 104} y={line.y - 4} width={line.width} height="8" rx="4" class={line.prompt ? 'l4' : 'l2'} />
+              </>
+            ))}
+            <rect x="104" y="332" width="12" height="4" rx="1" class="l4 cursor" />
           </>
         )}
 
@@ -172,6 +207,13 @@ const lines = Array.from({ length: 8 }, (_, i) => ({
     transition: transform 1.2s var(--ease);
   }
 
+  /* Pixel art: hard pixel edges. The crop is taken from the bottom only,
+     so the status display at the top of a game scene stays whole. */
+  .cover img.pixel {
+    image-rendering: pixelated;
+    object-position: center top;
+  }
+
   /* Intensity scale shared by the motifs. */
   .l0 {
     fill: rgb(255 255 255 / 0.05);
@@ -211,6 +253,14 @@ const lines = Array.from({ length: 8 }, (_, i) => ({
   }
   .t2 {
     fill: var(--c);
+  }
+
+  .prompt {
+    fill: none;
+    stroke: var(--c-soft);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
   }
 
   .ringline {

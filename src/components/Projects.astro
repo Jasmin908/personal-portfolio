@@ -1,6 +1,6 @@
 ---
 import ProjectCard from './ProjectCard.astro';
-import { projects } from '../data/projects';
+import { projects, projectCategories } from '../data/projects';
 import type { Locale } from '../i18n/config';
 import { useTranslations } from '../i18n/ui';
 
@@ -10,6 +10,24 @@ interface Props {
 
 const { locale } = Astro.props;
 const t = useTranslations(locale);
+
+const featured = projects.filter((project) => project.featured);
+const more = projects.filter((project) => !project.featured);
+// Numbers run through both groups, in the order of `projects`.
+const numberOf = (slug: string) => projects.findIndex((project) => project.slug === slug);
+
+// Only categories that have projects get a filter button.
+const filters = [
+  { id: 'all', label: t.projects.filterAll, count: projects.length },
+  ...projectCategories
+    .map((id) => ({ id, label: t.projects.categories[id], count: projects.filter((p) => p.category === id).length }))
+    .filter((filter) => filter.count > 0),
+];
+
+const groups = [
+  { id: 'featured', title: t.projects.featured, items: featured, size: 'large' as const },
+  { id: 'more', title: t.projects.more, items: more, size: 'compact' as const },
+].filter((group) => group.items.length > 0);
 ---
 
 <section class="section" id="projects" aria-labelledby="projects-title">
@@ -22,9 +40,41 @@ const t = useTranslations(locale);
       <p class="intro" data-reveal style="--d: 100ms">{t.projects.intro}</p>
     </header>
 
-    <div class="grid">
-      {projects.map((project, index) => <ProjectCard project={project} locale={locale} index={index} />)}
+    <!-- The filter needs JavaScript; without it the bar stays hidden and every project is shown. -->
+    <div class="filters" role="group" aria-label={t.projects.filterLabel} data-project-filters hidden>
+      {
+        filters.map((filter) => (
+          <button type="button" class="filter" data-filter={filter.id} aria-pressed={filter.id === 'all' ? 'true' : 'false'}>
+            {filter.label}
+            <span class="count" aria-hidden="true">
+              {filter.count}
+            </span>
+          </button>
+        ))
+      }
     </div>
+    <p class="visually-hidden" aria-live="polite" data-filter-status data-template={t.projects.filterResult}></p>
+
+    {
+      groups.map((group) => (
+        <section class="group" aria-labelledby={`projects-${group.id}`} data-project-group>
+          <h3 class="group-title" id={`projects-${group.id}`}>
+            {group.title}
+          </h3>
+          <div class:list={['grid', `grid--${group.size}`]} data-balance={group.size === 'large' ? '' : undefined}>
+            {group.items.map((project, index) => (
+              <ProjectCard
+                project={project}
+                locale={locale}
+                index={numberOf(project.slug)}
+                size={group.size}
+                wide={group.size === 'large' && group.items.length % 2 === 1 && index === group.items.length - 1}
+              />
+            ))}
+          </div>
+        </section>
+      ))
+    }
   </div>
 </section>
 
@@ -34,7 +84,7 @@ const t = useTranslations(locale);
     grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
     align-items: end;
     gap: 1.5rem 3rem;
-    margin-bottom: clamp(2.5rem, 5vw, 4rem);
+    margin-bottom: clamp(2rem, 4vw, 3rem);
   }
 
   .h2 {
@@ -47,20 +97,112 @@ const t = useTranslations(locale);
     justify-self: end;
   }
 
-  /* Alternating wide and narrow cards: 7/5, then 5/7, and so on. */
+  /* ---------- Filter ---------- */
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: clamp(2rem, 4vw, 3rem);
+  }
+
+  .filters[hidden] {
+    display: none;
+  }
+
+  .filter {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    min-height: 2.5rem;
+    padding: 0.45rem 0.95rem;
+    border-radius: var(--pill);
+    border: 1px solid var(--line);
+    background: rgb(27 26 42 / 0.55);
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition:
+      border-color 0.3s var(--ease),
+      color 0.3s var(--ease),
+      background-color 0.3s var(--ease);
+  }
+
+  .filter:hover {
+    border-color: var(--line-strong);
+    color: var(--text);
+  }
+
+  .filter:focus-visible {
+    outline: 2px solid var(--lime);
+    outline-offset: 2px;
+  }
+
+  .filter[aria-pressed='true'] {
+    border-color: var(--violet-soft);
+    background: rgb(139 92 246 / 0.2);
+    color: var(--text);
+  }
+
+  .count {
+    color: var(--muted);
+    font-size: 0.6875rem;
+  }
+
+  /* ---------- Groups ---------- */
+  .group + .group {
+    margin-top: clamp(3rem, 6vw, 4.5rem);
+  }
+
+  .group[hidden] {
+    display: none;
+  }
+
+  .group-title {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: clamp(1.25rem, 2.5vw, 1.75rem);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--violet-soft);
+  }
+
+  .group-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--line);
+  }
+
+  /* ---------- Grids ---------- */
   .grid {
     display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
     gap: clamp(1rem, 2vw, 1.5rem);
   }
 
-  .grid > :global(*) {
-    grid-column: span 7;
+  /* Featured: two equal columns. A single card left over in the last row
+     spans both columns (set as `wide` on the card). */
+  .grid--large {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .grid > :global(:nth-child(4n + 2)),
-  .grid > :global(:nth-child(4n + 3)) {
-    grid-column: span 5;
+  .grid--compact {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .grid > :global([hidden]) {
+    display: none;
+  }
+
+  @media (max-width: 1200px) {
+    .grid--compact {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
   }
 
   @media (max-width: 900px) {
@@ -72,10 +214,14 @@ const t = useTranslations(locale);
       justify-self: start;
     }
 
-    .grid > :global(*),
-    .grid > :global(:nth-child(4n + 2)),
-    .grid > :global(:nth-child(4n + 3)) {
-      grid-column: 1 / -1;
+    .grid--large {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .grid--compact {
+      grid-template-columns: 1fr;
     }
   }
 </style>

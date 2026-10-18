@@ -10,16 +10,20 @@ import { useTranslations } from '../i18n/ui';
 interface Props {
   project: Project;
   locale: Locale;
+  /** Say so when there are no links at all (project page), instead of showing nothing. */
+  explainEmpty?: boolean;
 }
 
-const { project, locale } = Astro.props;
+const { project, locale, explainEmpty = false } = Astro.props;
 const t = useTranslations(locale);
 
 const links = [
-  { url: project.demoUrl, label: project.demoLabel?.[locale] ?? t.projects.demo, pending: t.projects.demoPending },
-  { url: project.repoUrl, label: t.projects.repo, pending: t.projects.repoPending },
-].filter((link) => link.url || !(link.label === t.projects.repo && project.hideRepo));
+  { url: project.demoUrl, label: project.demoLabel?.[locale] ?? t.projects.demo, pending: t.projects.demoPending, hide: project.hideDemo },
+  { url: project.repoUrl, label: t.projects.repo, pending: t.projects.repoPending, hide: project.hideRepo },
+].filter((link) => link.url || !link.hide);
 ---
+
+{links.length === 0 && explainEmpty && <span class="pending">{t.project.notPublic}</span>}
 
 <ul class="links">
   {

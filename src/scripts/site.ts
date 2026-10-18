@@ -130,3 +130,36 @@ if (!reduceMotion && window.matchMedia('(hover: hover)').matches) {
     });
   });
 }
+
+/* ---------- Project filter ---------- */
+// Without JavaScript the filter bar stays hidden and every project is shown.
+const filterBar = document.querySelector<HTMLElement>('[data-project-filters]');
+
+if (filterBar) {
+  const buttons = [...filterBar.querySelectorAll<HTMLButtonElement>('button[data-filter]')];
+  const groups = [...document.querySelectorAll<HTMLElement>('[data-project-group]')];
+  const status = document.querySelector<HTMLElement>('[data-filter-status]');
+
+  const apply = (filter: string) => {
+    buttons.forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.filter === filter)));
+    let shown = 0;
+    for (const group of groups) {
+      const cards = [...group.querySelectorAll<HTMLElement>('[data-project-card]')];
+      const visible = cards.filter((card) => {
+        card.hidden = filter !== 'all' && card.dataset.category !== filter;
+        card.removeAttribute('data-wide');
+        return !card.hidden;
+      });
+      group.hidden = visible.length === 0;
+      // A single card left over in a two-column row spans the full width.
+      if (group.querySelector('[data-balance]') && visible.length % 2 === 1) {
+        visible[visible.length - 1].setAttribute('data-wide', '');
+      }
+      shown += visible.length;
+    }
+    if (status) status.textContent = (status.dataset.template ?? '').replace('{n}', String(shown));
+  };
+
+  buttons.forEach((button) => button.addEventListener('click', () => apply(button.dataset.filter ?? 'all')));
+  filterBar.hidden = false;
+}

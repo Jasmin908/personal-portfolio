@@ -35,7 +35,11 @@ const chapters = [
   { title: t.project.challenges, text: study.challenges },
   // Only for projects that describe their limits.
   ...(study.limitations ? [{ title: t.project.limitations, text: study.limitations }] : []),
-  { title: t.project.learnings, text: study.learnings ?? t.project.learningsPending, pending: !study.learnings },
+  {
+    title: t.project.learnings,
+    text: study.learnings ?? (project.status === 'completed' ? t.project.learningsOpen : t.project.learningsPending),
+    pending: !study.learnings,
+  },
 ];
 
 const next = projects[(projects.indexOf(project) + 1) % projects.length];
@@ -79,14 +83,14 @@ const screenshots = project.screenshots ?? [];
           </div>
           <div>
             <dt>{t.project.links}</dt>
-            <dd><ProjectLinks project={project} locale={locale} /></dd>
+            <dd><ProjectLinks project={project} locale={locale} explainEmpty /></dd>
           </div>
         </dl>
       </div>
     </header>
 
     <div class="container">
-      <figure class="hero-cover">
+      <figure class:list={['hero-cover', { 'hero-cover--full': project.pixelArt && project.image }]}>
         <ProjectCover project={project} locale={locale} sizes="(min-width: 1240px) 1240px, 100vw" eager />
         {!project.image && <figcaption>{t.projects.placeholderNote}</figcaption>}
       </figure>
@@ -120,12 +124,26 @@ const screenshots = project.screenshots ?? [];
           {
             screenshots.length > 0 ? (
               <div class="shots">
-                {screenshots.map((shot) => (
-                  <Image src={shot.src} alt={shot.alt[locale]} widths={[640, 1024, 1600]} sizes="(min-width: 900px) 60vw, 100vw" />
-                ))}
+                {screenshots.map((shot) =>
+                  project.pixelArt ? (
+                    <img
+                      class="pixel"
+                      src={shot.src.src}
+                      width={shot.src.width}
+                      height={shot.src.height}
+                      alt={shot.alt[locale]}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  ) : (
+                    <Image src={shot.src} alt={shot.alt[locale]} widths={[640, 1024, 1600]} sizes="(min-width: 900px) 60vw, 100vw" />
+                  ),
+                )}
               </div>
             ) : (
-              <p class="pending empty">{t.project.screenshotsPending}</p>
+              <p class="pending empty">
+                {project.category === 'tool' && !project.demoUrl ? t.project.screenshotsConsole : t.project.screenshotsPending}
+              </p>
             )
           }
         </section>
@@ -244,6 +262,16 @@ const screenshots = project.screenshots ?? [];
     overflow: hidden;
   }
 
+  /* A game scene is shown whole: its height follows the picture, so nothing is cut off. */
+  .hero-cover--full {
+    height: auto;
+  }
+
+  .hero-cover--full :global(img) {
+    display: block;
+    height: auto;
+  }
+
   figcaption {
     position: absolute;
     right: 1rem;
@@ -339,6 +367,10 @@ const screenshots = project.screenshots ?? [];
     height: auto;
     border-radius: var(--r-m);
     border: 1px solid var(--line);
+  }
+
+  .shots .pixel {
+    image-rendering: pixelated;
   }
 
   .after {

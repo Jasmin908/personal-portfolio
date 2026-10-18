@@ -9,6 +9,9 @@ import everboundBat from '../assets/projects/everbound-bat.webp';
 import everboundCave from '../assets/projects/everbound-cave.webp';
 import everboundGameplay from '../assets/projects/everbound-gameplay.webp';
 import everboundMenu from '../assets/projects/everbound-menu.webp';
+import formaHero from '../assets/projects/forma-studio-hero.webp';
+import formaPricing from '../assets/projects/forma-studio-pricing.webp';
+import formaProjects from '../assets/projects/forma-studio-projects.webp';
 import habitflowCalendar from '../assets/projects/habitflow-calendar.webp';
 import habitflowDashboard from '../assets/projects/habitflow-dashboard.webp';
 import habitflowStatistics from '../assets/projects/habitflow-statistics.webp';
@@ -25,10 +28,16 @@ import habitflowStatistics from '../assets/projects/habitflow-statistics.webp';
  *
  * Links: leave `demoUrl` / `repoUrl` out until they exist. Missing links are
  * shown as "to follow" and are not clickable.
+ *
+ * Order: featured projects first, in the order shown on the home page, then
+ * the smaller ones under "More projects".
  */
 
 export type ProjectStatus = 'completed' | 'in-development' | 'prototype' | 'planned';
-export type CoverVariant = 'grid' | 'dialog' | 'timeline' | 'scan';
+export type CoverVariant = 'grid' | 'dialog' | 'timeline' | 'scan' | 'terminal';
+/** Used by the filter above the project list. */
+export type ProjectCategory = 'web-app' | 'game' | 'website' | 'tool';
+export const projectCategories: ProjectCategory[] = ['web-app', 'game', 'website', 'tool'];
 export type Accent = 'violet' | 'blue' | 'lime';
 
 export interface CaseStudy {
@@ -52,16 +61,27 @@ export interface Project {
   /** Used in the URL: /projekte/<slug>/ and /en/projects/<slug>/ */
   slug: string;
   status: ProjectStatus;
+  category: ProjectCategory;
+  /** Shown large under "Featured projects"; all others appear under "More projects". */
+  featured?: boolean;
   /** Placeholder artwork, used as long as `image` is not set. */
   cover: CoverVariant;
   accent: Accent;
   image?: ImageMetadata;
   imageAlt?: Localized<string>;
   screenshots?: Screenshot[];
+  /**
+   * The images are pixel art. They are then shown from the original files,
+   * without resizing or re-compression, and scaled with hard pixel edges, so
+   * they stay sharp. The page header shows the whole picture instead of a crop.
+   */
+  pixelArt?: boolean;
   stack: string[];
   demoUrl?: string;
   /** Replaces the usual "Live demo" label and adds a prominent button on the detail page, e.g. "Play game". */
   demoLabel?: Localized<string>;
+  /** Set when there is nothing to try online, e.g. a console program, so no "to follow" note is shown. */
+  hideDemo?: boolean;
   repoUrl?: string;
   /** Set when no public repository is planned for now, so no "to follow" note is shown. */
   hideRepo?: boolean;
@@ -77,6 +97,8 @@ export const projects: Project[] = [
   {
     slug: 'habitflow',
     status: 'completed',
+    category: 'web-app',
+    featured: true,
     cover: 'grid',
     accent: 'violet',
     image: habitflowDashboard,
@@ -168,7 +190,9 @@ export const projects: Project[] = [
   },
   {
     slug: 'ai-coding-mentor',
-    status: 'completed',
+    status: 'prototype',
+    category: 'web-app',
+    featured: true,
     cover: 'dialog',
     accent: 'blue',
     image: mentorWorkspace,
@@ -230,7 +254,7 @@ export const projects: Project[] = [
     caseStudy: {
       de: {
         overview:
-          'AI Coding Mentor ist eine Webanwendung zum Programmierenlernen mit zwei Bereichen: einem Arbeitsbereich mit Code-Editor und Mentor sowie einer Übungsbibliothek mit 18 Aufgaben in Python, JavaScript und Java. Die Anwendung ist in Version 2.0 veröffentlicht und läuft vollständig im Browser. Sie ersetzt einen früheren Python-Prototyp und wurde mit Unterstützung von Claude Code entwickelt.',
+          'AI Coding Mentor ist eine Webanwendung zum Programmierenlernen mit zwei Bereichen: einem Arbeitsbereich mit Code-Editor und Mentor sowie einer Übungsbibliothek mit 18 Aufgaben in Python, JavaScript und Java. Sie ist als Prototyp in Version 2.0 veröffentlicht und läuft vollständig im Browser. Sie ersetzt einen früheren Python-Prototyp und wurde mit Unterstützung von Claude Code entwickelt.',
         problem:
           'Wer programmieren lernt, bekommt von KI-Assistenten oft sofort fertigen Code. Die Aufgabe ist dann gelöst, verstanden hat man kaum mehr als vorher. Zum Lernen hilft es mehr, den eigenen Code erklärt zu bekommen, auf typische Fehler hingewiesen zu werden und Hinweise zu erhalten, die das Denken nicht abnehmen.',
         solution:
@@ -246,7 +270,7 @@ export const projects: Project[] = [
       },
       en: {
         overview:
-          'AI Coding Mentor is a web application for learning to program, with two areas: a workspace with a code editor and a mentor, and an exercise library with 18 tasks in Python, JavaScript and Java. Version 2.0 is released and runs entirely in the browser. It replaces an earlier Python prototype and was developed with assistance from Claude Code.',
+          'AI Coding Mentor is a web application for learning to program, with two areas: a workspace with a code editor and a mentor, and an exercise library with 18 tasks in Python, JavaScript and Java. It is published as a prototype in version 2.0 and runs entirely in the browser. It replaces an earlier Python prototype and was developed with assistance from Claude Code.',
         problem:
           'People who are learning to program often get finished code from AI assistants straight away. The task is solved, but they understand barely more than before. For learning, it helps more to have your own code explained, to be pointed to typical mistakes, and to get hints that do not do the thinking for you.',
         solution:
@@ -265,6 +289,8 @@ export const projects: Project[] = [
   {
     slug: 'everbound',
     status: 'prototype',
+    category: 'game',
+    featured: true,
     cover: 'grid',
     accent: 'violet',
     image: everboundGameplay,
@@ -299,6 +325,7 @@ export const projects: Project[] = [
     demoUrl: 'https://jasmin-everbound.netlify.app',
     demoLabel: { de: 'Jetzt spielen', en: 'Play game' },
     hideRepo: true,
+    pixelArt: true,
     title: { de: 'Everbound', en: 'Everbound' },
     tagline: { de: '2D-Pixel-Art-Plattformer', en: '2D Pixel Art Platformer' },
     summary: {
@@ -369,8 +396,297 @@ export const projects: Project[] = [
     },
   },
   {
+    slug: 'forma-studio',
+    status: 'completed',
+    category: 'website',
+    featured: true,
+    cover: 'grid',
+    accent: 'lime',
+    image: formaHero,
+    imageAlt: {
+      de: 'Startseite von Forma Studio: dunkler Hintergrund mit violettem Farbverlauf, Schlagzeile «Websites für Firmen mit Ambitionen» und zwei Buttons',
+      en: 'Forma Studio home page: a dark background with a violet gradient, the headline "Websites für Firmen mit Ambitionen" and two buttons',
+    },
+    screenshots: [
+      {
+        src: formaProjects,
+        alt: {
+          de: 'Projektbereich von Forma Studio mit drei Konzeptprojekten: Café Lumière, NOVA Studio und ATELIER 27',
+          en: 'Forma Studio projects section with three concept projects: Café Lumière, NOVA Studio and ATELIER 27',
+        },
+      },
+      {
+        src: formaPricing,
+        alt: {
+          de: 'Preisbereich von Forma Studio mit Einstiegspreisen für neue und bestehende Websites und einem Hinweis zu Domain und Hosting',
+          en: 'Forma Studio pricing section with starting prices for new and existing websites, and a note on domain and hosting',
+        },
+      },
+    ],
+    stack: ['Astro', 'HTML', 'CSS', 'JavaScript', 'Netlify Forms'],
+    demoUrl: 'https://forma-webdesign.netlify.app/',
+    demoLabel: { de: 'Website ansehen', en: 'Visit website' },
+    repoUrl: 'https://github.com/Jasmin908/forma-studio',
+    title: { de: 'Forma Studio', en: 'Forma Studio' },
+    tagline: { de: 'Website für mein Webdesign-Studio', en: 'Website for my web design studio' },
+    summary: {
+      de: 'Die zweisprachige Website von Forma Studio, meinem Webdesign-Angebot für kleine Unternehmen in der Schweiz: Leistungen, Einstiegspreise, der Ablauf eines Projekts, drei Konzept-Websites und ein Kontaktformular.',
+      en: 'The bilingual website of Forma Studio, my web design offer for small businesses in Switzerland: services, starting prices, how a project runs, three concept websites and a contact form.',
+    },
+    features: {
+      de: [
+        'Zweisprachig: Deutsch als Hauptsprache, Englisch unter /en/',
+        'Responsives Layout für Desktop, Tablet und Smartphone',
+        'Leistungen und Preisliste, pro Sprache einmal definiert und in Leistungen, Preisen und Kontaktformular wiederverwendet',
+        'Ablauf eines Projekts in fünf Schritten',
+        'Portfolio mit drei Konzept-Websites für erfundene Unternehmen, jede mit eigener Live-Demo',
+        'Kontaktformular über Netlify Forms, mit Honeypot-Feld und Mindestzeit gegen Spam',
+        'Animationen beim Scrollen und dezente Hintergrundbewegungen, reduziert bei «Bewegung reduzieren»',
+        'Impressum und Datenschutzerklärung in beiden Sprachen',
+      ],
+      en: [
+        'Bilingual: German as the main language, English under /en/',
+        'Responsive layout for desktop, tablet and phone',
+        'Services and a price list, defined once per language and reused by the services, the prices and the contact form',
+        'How a project runs, in five steps',
+        'A portfolio of three concept websites for fictional businesses, each with its own live demo',
+        'A contact form through Netlify Forms, with a honeypot field and a minimum time against spam',
+        'Scroll animations and subtle background motion, reduced when "reduce motion" is set',
+        'Legal notice and privacy policy in both languages',
+      ],
+    },
+    caseStudy: {
+      de: {
+        overview:
+          'Forma Studio ist mein Webdesign-Angebot für kleine Unternehmen in der Schweiz, und diese Website stellt es vor. Sie ist veröffentlicht und zeigt Leistungen, Preise, den Ablauf eines Projekts und drei Konzept-Websites. Anfragen kommen über ein Kontaktformular.',
+        problem:
+          'Wer ein Webdesign-Angebot startet, hat noch keine Kundenprojekte, die sich zeigen lassen. Gleichzeitig wollen Interessierte schnell sehen, was es kostet, wie die Zusammenarbeit abläuft und wie die Ergebnisse aussehen.',
+        solution:
+          'Die Website beantwortet diese Fragen auf einer Seite: Leistungen mit Einstiegspreisen, ein Ablauf in fünf Schritten und ein Portfolio. Statt Kundenarbeiten zeigt das Portfolio drei Konzept-Websites für erfundene Unternehmen aus Gastronomie, Beauty und Architektur. Sie sind klar als Konzeptprojekte gekennzeichnet.',
+        implementation:
+          'Die Website ist mit Astro gebaut und wird als statische Seite auf Netlify veröffentlicht. Alle Texte liegen pro Sprache in einer eigenen Datei; Leistungen und Preise sind dort einmal definiert und speisen den Leistungsbereich, die Preisliste und die Auswahl im Kontaktformular. Das Formular läuft über Netlify Forms und braucht keine API-Schlüssel. Browser-Icons und Bilder für das Teilen in sozialen Netzwerken erzeugt ein eigenes Skript. Die Website wurde mit Unterstützung von Claude Code entwickelt.',
+        challenges:
+          'Wichtig war, ehrlich zu bleiben: keine erfundenen Kunden, Bewertungen oder Erfahrungen, und Konzeptprojekte nie als Kundenaufträge darstellen. Dazu kam der Spamschutz ohne Captcha und ohne zusätzliche Dienste, gelöst mit einem versteckten Feld, einer Mindestzeit vor dem Absenden und dem Filter von Netlify.',
+        limitations:
+          'Das Kontaktformular funktioniert nur auf der veröffentlichten Website; in der lokalen Vorschau prüft es die Eingaben, sendet aber nichts. Das Portfolio enthält bisher nur Konzeptprojekte.',
+      },
+      en: {
+        overview:
+          'Forma Studio is my web design offer for small businesses in Switzerland, and this website presents it. It is published and shows the services, prices, how a project runs and three concept websites. Enquiries come in through a contact form.',
+        problem:
+          'Starting a web design offer means having no client projects to show yet. At the same time, people want to see quickly what it costs, how working together runs and what the results look like.',
+        solution:
+          'The website answers these questions on one page: services with starting prices, a process in five steps and a portfolio. Instead of client work, the portfolio shows three concept websites for fictional businesses in hospitality, beauty and architecture, clearly marked as concept projects.',
+        implementation:
+          'The website is built with Astro and published as a static site on Netlify. All texts live in one file per language; services and prices are defined there once and feed the services section, the price list and the choice in the contact form. The form runs through Netlify Forms and needs no API keys. A script of its own generates the browser icons and the images for sharing on social networks. The website was developed with assistance from Claude Code.',
+        challenges:
+          'Staying honest mattered most: no invented clients, reviews or experience, and concept projects never presented as client work. Spam protection was another point, without a captcha or extra services: a hidden field, a minimum time before sending and the Netlify filter.',
+        limitations:
+          'The contact form only works on the published website; in the local preview it checks the entries but sends nothing. So far the portfolio contains concept projects only.',
+      },
+    },
+  },
+  {
+    slug: 'image-downloader',
+    status: 'completed',
+    category: 'tool',
+    featured: true,
+    cover: 'terminal',
+    accent: 'blue',
+    stack: ['C#', '.NET', 'LINQ', 'CSV', 'HttpClient', 'Async/Await'],
+    hideDemo: true,
+    hideRepo: true,
+    title: { de: 'Image Downloader & Article Synchronizer', en: 'Image Downloader & Article Synchronizer' },
+    tagline: { de: 'Artikelabgleich & Bilddownload', en: 'Article Sync & Image Download' },
+    summary: {
+      de: 'Ein Konsolenprogramm in C#, das eine aktuelle mit einer früheren Artikelliste vergleicht, neue und entfernte Artikel erkennt, die Ergebnisse als CSV speichert und für jeden neuen Artikel das Produktbild herunterlädt.',
+      en: 'A C# console program that compares a current article list with a previous one, detects added and removed articles, saves the results as CSV and downloads the product image for every new article.',
+    },
+    features: {
+      de: [
+        'Einlesen der aktuellen und der früheren Artikelliste aus CSV-Dateien, ohne Kopfzeile und Leerzeilen',
+        'Abgleich mit LINQ, unabhängig von Gross- und Kleinschreibung',
+        'Erkennung neuer und entfernter Artikel',
+        'Export der Ergebnisse in zwei CSV-Dateien',
+        'Asynchroner Download der Bilder neuer Artikel mit HttpClient',
+        'Ordner für die Bilder wird bei Bedarf angelegt',
+        'Meldung pro Artikel, ob der Download geklappt hat',
+        'Die aktuelle Liste wird am Ende zur Vergleichsbasis für den nächsten Lauf',
+      ],
+      en: [
+        'Reads the current and the previous article list from CSV files, skipping the header and empty lines',
+        'Compares them with LINQ, ignoring upper and lower case',
+        'Detects added and removed articles',
+        'Exports the results to two CSV files',
+        'Downloads the images of new articles asynchronously with HttpClient',
+        'Creates the image folder when needed',
+        'Reports for each article whether the download worked',
+        'Stores the current list as the basis for the next comparison',
+      ],
+    },
+    caseStudy: {
+      de: {
+        overview:
+          'Das Programm gleicht zwei Artikellisten ab und lädt für neue Artikel automatisch die Produktbilder herunter. Es ist eine Konsolenanwendung in C# auf .NET.',
+        problem:
+          'Wenn sich ein Artikelsortiment ändert, müssen für neue Artikel Bilder beschafft und entfernte Artikel erkannt werden. Von Hand heisst das: Listen vergleichen, Nummern abschreiben, Bilder einzeln herunterladen. Das kostet Zeit und führt leicht zu Fehlern.',
+        solution:
+          'Das Programm liest die aktuelle und die frühere Liste, berechnet daraus die neuen und die entfernten Artikel und speichert beide Ergebnisse als CSV. Für jeden neuen Artikel holt es das Bild von einem Bilddienst und legt es unter der Artikelnummer ab. Zum Schluss wird die aktuelle Liste zur Vergleichsbasis für den nächsten Lauf.',
+        implementation:
+          'Die Listen werden mit File.ReadAllLines gelesen und mit LINQ bereinigt: Kopfzeile überspringen, Leerzeilen entfernen, Leerzeichen kürzen. Except mit StringComparer.OrdinalIgnoreCase liefert die Unterschiede in beide Richtungen. Die Downloads laufen mit HttpClient und async/await; der Statuscode jeder Antwort wird geprüft, bevor das Bild gespeichert wird.',
+        challenges:
+          'Die Artikelnummern in der Liste beginnen mit einem «W», der Bilddienst erwartet sie aber ohne. Das Programm entfernt das Zeichen deshalb nur für die Anfrage und behält die ursprüngliche Nummer als Dateiname. Ausserdem darf eine leere aktuelle Liste die gespeicherte Vergleichsbasis nicht überschreiben; das wird vor dem Speichern geprüft.',
+        limitations:
+          'Die Bilder werden nacheinander geladen, ohne erneuten Versuch bei einem Fehler, und immer als .jpg gespeichert. Dateinamen sind im Code festgelegt. Die Adresse und der Zugangsschlüssel des Bilddienstes stehen im Code; vor einer Veröffentlichung des Quellcodes gehören sie in eine Umgebungsvariable. Der Quellcode ist darum nicht öffentlich.',
+      },
+      en: {
+        overview:
+          'The program compares two article lists and automatically downloads the product images for new articles. It is a C# console application on .NET.',
+        problem:
+          'When a range of articles changes, images have to be found for the new articles and removed articles have to be identified. By hand, that means comparing lists, copying numbers and downloading images one at a time. It takes time and invites mistakes.',
+        solution:
+          'The program reads the current and the previous list, works out the added and the removed articles and saves both results as CSV. For every new article it fetches the image from an image service and stores it under the article number. Finally, the current list becomes the basis for the next run.',
+        implementation:
+          'The lists are read with File.ReadAllLines and cleaned with LINQ: skip the header, drop empty lines, trim spaces. Except with StringComparer.OrdinalIgnoreCase gives the differences in both directions. Downloads use HttpClient with async/await, and the status code of every response is checked before the image is saved.',
+        challenges:
+          'The article numbers in the list start with a "W", but the image service expects them without it. The program therefore removes the letter for the request only and keeps the original number as the file name. Also, an empty current list must not overwrite the stored basis for comparison, so this is checked before saving.',
+        limitations:
+          'Images are downloaded one after another, with no retry after an error, and are always saved as .jpg. File names are fixed in the code. The address and the access key of the image service are in the code; before the source code is published they belong in an environment variable. That is why the source code is not public.',
+      },
+    },
+  },
+  {
+    slug: 'week-planner',
+    status: 'completed',
+    category: 'tool',
+    cover: 'terminal',
+    accent: 'violet',
+    stack: ['C#', '.NET', 'JSON', 'File I/O'],
+    hideDemo: true,
+    hideRepo: true,
+    title: { de: 'Markdown Week Planner Generator', en: 'Markdown Week Planner Generator' },
+    tagline: { de: 'Planungsdateien auf Knopfdruck', en: 'Planning Files on Demand' },
+    summary: {
+      de: 'Eine Konsolenanwendung in C#, die für einen wählbaren Zeitraum Markdown-Notizen für jeden Arbeitstag anlegt, geordnet in Ordnern nach Jahr, Monat und Kalenderwoche.',
+      en: 'A C# console application that creates a Markdown note for every working day of a chosen period, sorted into folders by year, month and calendar week.',
+    },
+    features: {
+      de: [
+        'Startmonat und Anzahl Monate werden beim Start eingegeben',
+        'Ordner für Jahr, Monat und Kalenderwoche werden automatisch angelegt',
+        'Eine Markdown-Datei pro Tag, von Montag bis Freitag',
+        'Vorlage mit Platzhaltern für Datum und Wochentag',
+        'Kalenderwochen nach ISO 8601',
+        'Speicherort und Vorlage in einer JSON-Konfiguration',
+        'Bestehende Dateien werden nie überschrieben',
+      ],
+      en: [
+        'Start month and number of months are entered at startup',
+        'Folders for year, month and calendar week are created automatically',
+        'One Markdown file per day, Monday to Friday',
+        'A template with placeholders for the date and the weekday',
+        'Calendar weeks according to ISO 8601',
+        'Storage location and template in a JSON configuration',
+        'Existing files are never overwritten',
+      ],
+    },
+    caseStudy: {
+      de: {
+        overview:
+          'Der Week Planner Generator ist ein Konsolenprogramm in C#. Er erzeugt für einen wählbaren Zeitraum eine Ordnerstruktur mit einer Markdown-Notiz für jeden Arbeitstag.',
+        problem:
+          'Wer seine Woche in Markdown-Dateien plant, legt Ordner und Dateien immer wieder von Hand an und kopiert dieselbe Vorlage. Das ist eintönig, und bei Kalenderwochen schleichen sich leicht Fehler ein.',
+        solution:
+          'Nach der Eingabe von Startmonat und Anzahl Monaten legt das Programm für jeden Monat die Ordner an, ermittelt die Wochen und erzeugt für Montag bis Freitag je eine Datei aus der Vorlage, mit Datum und Wochentag bereits eingesetzt. Wo schon eine Datei liegt, bleibt sie unverändert.',
+        implementation:
+          'Die Einstellungen werden mit System.Text.Json in eine eigene Settings-Klasse gelesen. Datumsangaben rechnet das Programm mit DateTime, die Kalenderwoche liefert ISOWeek.GetWeekOfYear. Ordner entstehen mit Directory.CreateDirectory, das bestehende Ordner einfach übernimmt. Vor dem Schreiben prüft File.Exists, ob eine Datei schon vorhanden ist.',
+        challenges:
+          'Knifflig war die Wochenlogik: Das Programm sucht den ersten Montag des Monats, geht von dort Woche für Woche weiter und hört am Monatsende mitten in der Woche auf. Die Kalenderwoche richtet sich nach ISO 8601, damit die Nummern zu üblichen Kalendern passen, auch an Jahreswechseln.',
+        limitations:
+          'Arbeitstage vor dem ersten Montag eines Monats erhalten keine Datei. Eingaben werden nicht geprüft, ein falsches Format beendet das Programm mit einem Fehler. Die Pfade sind für Windows geschrieben.',
+      },
+      en: {
+        overview:
+          'The Week Planner Generator is a C# console program. For a chosen period, it creates a folder structure with a Markdown note for every working day.',
+        problem:
+          'Planning your week in Markdown files means creating folders and files by hand again and again and copying the same template. It is repetitive, and calendar weeks are easy to get wrong.',
+        solution:
+          'After the start month and the number of months are entered, the program creates the folders for each month, works out the weeks and writes one file per day from Monday to Friday from the template, with the date and weekday already filled in. Where a file already exists, it is left unchanged.',
+        implementation:
+          'The settings are read into a Settings class of their own with System.Text.Json. Dates are calculated with DateTime, and ISOWeek.GetWeekOfYear provides the calendar week. Folders are created with Directory.CreateDirectory, which simply accepts existing ones. Before writing, File.Exists checks whether a file is already there.',
+        challenges:
+          'The week logic was the tricky part: the program looks for the first Monday of the month, moves on week by week from there and stops at the end of the month, even mid-week. Calendar weeks follow ISO 8601 so the numbers match common calendars, including around the turn of the year.',
+        limitations:
+          'Working days before the first Monday of a month get no file. Input is not validated, so a wrong format ends the program with an error. The paths are written for Windows.',
+      },
+    },
+  },
+  {
+    slug: 'python-task-manager',
+    status: 'completed',
+    category: 'tool',
+    cover: 'terminal',
+    accent: 'lime',
+    stack: ['Python'],
+    hideDemo: true,
+    hideRepo: true,
+    title: { de: 'Python Task Manager', en: 'Python Task Manager' },
+    tagline: { de: 'Aufgabenliste im Terminal', en: 'A To-Do List in the Terminal' },
+    summary: {
+      de: 'Ein kleines Kommandozeilenprogramm in Python: Über ein Menü lassen sich Aufgaben anzeigen, hinzufügen und entfernen. Eine Übung zu Funktionen, Schleifen, Listen und Fehlerbehandlung.',
+      en: 'A small command-line program in Python: a menu lets you view, add and remove tasks. An exercise in functions, loops, lists and error handling.',
+    },
+    features: {
+      de: [
+        'Interaktives Menü mit vier Optionen, das sich wiederholt, bis man es beendet',
+        'Nummerierte Aufgabenliste',
+        'Aufgaben hinzufügen und über ihre Nummer entfernen',
+        'Ungültige Nummern werden mit try/except abgefangen',
+        'Hinweis, wenn die Liste leer ist',
+      ],
+      en: [
+        'An interactive menu with four options that repeats until you exit',
+        'A numbered task list',
+        'Add tasks and remove them by their number',
+        'Invalid numbers are caught with try/except',
+        'A message when the list is empty',
+      ],
+    },
+    caseStudy: {
+      de: {
+        overview:
+          'Der Task Manager ist ein kurzes Python-Programm für die Kommandozeile. Er verwaltet eine Aufgabenliste über ein einfaches Menü.',
+        problem:
+          'Das Projekt ist eine Übung: Grundlagen wie Funktionen, Schleifen, Listen und Benutzereingaben sollten in einem kleinen, vollständigen Programm zusammenkommen.',
+        solution:
+          'Eine Endlosschleife zeigt das Menü, liest die Auswahl und ruft die passende Aktion auf, bis «Beenden» gewählt wird. Die Anzeige der Liste steckt in einer eigenen Funktion, die auch vor dem Entfernen genutzt wird.',
+        implementation:
+          'Die Aufgaben liegen in einer Python-Liste. enumerate mit Startwert 1 nummeriert sie für die Anzeige, append fügt hinzu und pop entfernt. Eingaben werden mit input gelesen und für das Entfernen in eine Zahl umgewandelt.',
+        challenges:
+          'Die Liste zählt ab 0, Menschen zählen ab 1: Die eingegebene Nummer wird deshalb vor dem Entfernen um eins verringert. Eingaben, die keine gültige Nummer sind, fängt ein try/except ab, statt das Programm abstürzen zu lassen.',
+        limitations:
+          'Die Aufgaben existieren nur, solange das Programm läuft, und werden nicht gespeichert. Eine ungültige Menüauswahl zeigt einfach das Menü erneut, ohne Hinweis. Das try/except fängt alle Fehler ab statt nur die erwarteten.',
+      },
+      en: {
+        overview:
+          'The Task Manager is a short Python program for the command line. It manages a task list through a simple menu.',
+        problem:
+          'The project is an exercise: basics such as functions, loops, lists and user input were meant to come together in one small, complete program.',
+        solution:
+          'An endless loop shows the menu, reads the choice and runs the matching action until "Exit" is chosen. Showing the list is a function of its own, which is also used before removing a task.',
+        implementation:
+          'The tasks are kept in a Python list. enumerate with a start value of 1 numbers them for display, append adds and pop removes. Input is read with input and converted to a number for removing.',
+        challenges:
+          'The list counts from 0, people count from 1, so the number entered is reduced by one before removing. Input that is not a valid number is caught by a try/except instead of crashing the program.',
+        limitations:
+          'Tasks only exist while the program is running and are not saved. An invalid menu choice simply shows the menu again, without a message. The try/except catches every error rather than only the expected ones.',
+      },
+    },
+  },
+  {
     slug: 'smart-study-planner',
     status: 'planned',
+    category: 'web-app',
     cover: 'timeline',
     accent: 'lime',
     // Technology not decided yet; an empty stack is shown as "not decided".
@@ -411,6 +727,7 @@ export const projects: Project[] = [
   {
     slug: 'accessibility-analyzer',
     status: 'planned',
+    category: 'tool',
     cover: 'scan',
     accent: 'violet',
     stack: ['JavaScript', 'HTML', 'CSS'],

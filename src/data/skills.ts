@@ -3,7 +3,8 @@ import type { IconName } from './icons';
 
 export interface SkillSubgroup {
   label: Localized<string>;
-  items: string[];
+  /** A plain string where the name is the same in both languages. */
+  items: (string | Localized<string>)[];
 }
 
 export interface SkillGroup {
@@ -62,8 +63,14 @@ export const tools: ToolGroup = {
     },
     {
       // Godot is a tool too, but already listed under Game Development.
-      label: { de: 'Weitere Werkzeuge', en: 'Other tools' },
-      items: ['VMware Workstation', 'Claude Code'],
+      // Claude Code runs in the terminal, so it belongs with the command line.
+      label: { de: 'Kommandozeile & Virtualisierung', en: 'Command line & virtualisation' },
+      items: [
+        { de: 'Windows-Eingabeaufforderung (CMD)', en: 'Windows Command Prompt (CMD)' },
+        'Claude Code',
+        'Microsoft Hyper-V',
+        'VMware Workstation',
+      ],
     },
   ],
 };

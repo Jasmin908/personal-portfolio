@@ -58,7 +58,7 @@ const number = (index: number) => String(index + 1).padStart(2, '0');
               <h4>{subgroup.label[locale]}</h4>
               <ul class="items">
                 {subgroup.items.map((item) => (
-                  <li>{item}</li>
+                  <li>{typeof item === 'string' ? item : item[locale]}</li>
                 ))}
               </ul>
             </div>
