@@ -21,6 +21,10 @@ const { project, locale, index, size = 'large', wide = false } = Astro.props;
 const t = useTranslations(locale);
 const number = String(index + 1).padStart(2, '0');
 const planned = project.status === 'planned';
+// Cards show a few technologies; the full list is on the project page. The
+// rest stay in the list for screen readers and are summed up as "+n".
+const maxTags = size === 'compact' ? 4 : 5;
+const hiddenTags = Math.max(0, project.stack.length - maxTags);
 ---
 
 <article
@@ -29,6 +33,7 @@ const planned = project.status === 'planned';
   data-reveal
   data-project-card
   data-category={project.category}
+  data-status={project.status}
   data-wide={wide ? '' : undefined}
   style={`--d: ${(index % 2) * 90}ms`}
 >
@@ -51,7 +56,18 @@ const planned = project.status === 'planned';
 
     <ul class="stack" aria-label={planned ? t.projects.stackPlanned : t.projects.stack}>
       {planned && project.stack.length > 0 && <li class="stack-note">{t.projects.stackPlannedShort}:</li>}
-      {project.stack.map((tech) => <li class:list={{ 'stack-planned': planned }}>{tech}</li>)}
+      {
+        project.stack.map((tech, i) => (
+          <li class:list={{ 'stack-planned': planned, 'visually-hidden': i >= maxTags }}>{tech}</li>
+        ))
+      }
+      {
+        hiddenTags > 0 && (
+          <li class="stack-more" aria-hidden="true" title={t.projects.moreTags.replace('{n}', String(hiddenTags))}>
+            +{hiddenTags}
+          </li>
+        )
+      }
       {project.stack.length === 0 && <li class="stack-note">{t.projects.stackOpen}</li>}
     </ul>
 
@@ -106,10 +122,18 @@ const planned = project.status === 'planned';
     transform: scale(1.05);
   }
 
+  /* One picture format for every card, so screenshots get room and cards line up. */
   .media {
     position: relative;
-    height: clamp(13rem, 24vw, 19rem);
+    aspect-ratio: 16 / 10;
     border-bottom: 1px solid var(--line);
+  }
+
+  /* The preview fills the frame; its own size must not stretch it. */
+  .media :global(.cover) {
+    position: absolute;
+    inset: 0;
+    height: auto;
   }
 
   .badge {
@@ -202,6 +226,11 @@ const planned = project.status === 'planned';
     color: var(--muted);
   }
 
+  .stack .stack-more {
+    border-style: dashed;
+    color: var(--muted);
+  }
+
   .stack .stack-note {
     padding-inline: 0;
     border-color: transparent;
@@ -240,9 +269,6 @@ const planned = project.status === 'planned';
     border-radius: var(--r-m);
   }
 
-  .card--compact .media {
-    height: clamp(10rem, 15vw, 12rem);
-  }
 
   .card--compact .body {
     padding: clamp(1.25rem, 2vw, 1.6rem);
@@ -269,6 +295,32 @@ const planned = project.status === 'planned';
     font-size: 2.25rem;
   }
 
+  /* ---------- Status ---------- */
+  /* Planned: nothing exists yet, so the card is drawn in outline and its
+     artwork is dimmed. Completed and prototype differ by their badge colour. */
+  .card[data-status='planned'] {
+    border-style: dashed;
+    border-color: var(--line-strong);
+    background: rgb(27 26 42 / 0.45);
+  }
+
+  .card[data-status='planned'] .media :global(.cover) {
+    opacity: 0.6;
+    filter: saturate(0.6);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card:hover,
+    .card:focus-within {
+      translate: none;
+    }
+
+    .card:hover :global(.cover svg),
+    .card:hover :global(.cover img) {
+      transform: none;
+    }
+  }
+
   /* ---------- Wide: a large card alone in its row ---------- */
   @media (min-width: 901px) {
     .card[data-wide] {
@@ -278,7 +330,7 @@ const planned = project.status === 'planned';
 
     .card[data-wide] .media {
       flex: 0 0 55%;
-      height: auto;
+      aspect-ratio: auto;
       min-height: clamp(17rem, 26vw, 21rem);
       border-bottom: 0;
       border-right: 1px solid var(--line);

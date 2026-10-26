@@ -1,11 +1,11 @@
 ---
-import { Image } from 'astro:assets';
+import { Image, getImage } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import ProjectCover from '../components/ProjectCover.astro';
 import ProjectLinks from '../components/ProjectLinks.astro';
 import StatusBadge from '../components/StatusBadge.astro';
 import Arrow from '../components/Arrow.astro';
-import { projects, type Project } from '../data/projects';
+import { projects, type FeatureGroup, type Project } from '../data/projects';
 import { localeCodes, projectPath, sectionPath, type Locale } from '../i18n/config';
 import { useTranslations } from '../i18n/ui';
 import { site } from '../data/site';
@@ -24,11 +24,45 @@ const alternates = Object.fromEntries(
 ) as Record<Locale, string>;
 
 const features = project.features?.[locale] ?? [];
+const featureGroups = project.featureGroups?.[locale] ?? [];
+const facts = project.facts?.[locale] ?? [];
+const screenshots = project.screenshots ?? [];
 
-const chapters = [
+// Large versions for the lightbox. Pixel art keeps its original file, so it stays sharp.
+const gallery = await Promise.all(
+  screenshots.map(async (shot) => ({
+    ...shot,
+    full: project.pixelArt
+      ? shot.src.src
+      : (await getImage({ src: shot.src, width: Math.min(1920, shot.src.width), format: 'webp' })).src,
+  })),
+);
+
+interface Chapter {
+  title: string;
+  text?: string;
+  list?: string[];
+  groups?: FeatureGroup[];
+  gallery?: boolean;
+  pending?: boolean;
+  empty?: boolean;
+  /** Content runs across the full width instead of the right-hand column. */
+  wide?: boolean;
+}
+
+const screenshotsPending =
+  project.category === 'tool' && !project.demoUrl ? t.project.screenshotsConsole : t.project.screenshotsPending;
+
+const chapters: Chapter[] = [
   { title: t.project.overview, text: study.overview },
-  // Shown as a list, and only for projects that have features to list.
-  ...(features.length > 0 ? [{ title: t.project.features, list: features }] : []),
+  // Grouped by theme where the project has groups, otherwise a plain list.
+  ...(featureGroups.length > 0
+    ? [{ title: t.project.features, groups: featureGroups, wide: true }]
+    : features.length > 0
+      ? [{ title: t.project.features, list: features }]
+      : []),
+  // Screenshots early, so the page shows the project before explaining it.
+  ...(gallery.length > 0 ? [{ title: t.project.screenshots, gallery: true, wide: true }] : []),
   { title: t.project.problem, text: study.problem },
   { title: t.project.solution, text: study.solution },
   { title: t.project.implementation, text: study.implementation },
@@ -40,10 +74,10 @@ const chapters = [
     text: study.learnings ?? (project.status === 'completed' ? t.project.learningsOpen : t.project.learningsPending),
     pending: !study.learnings,
   },
+  ...(gallery.length === 0 ? [{ title: t.project.screenshots, text: screenshotsPending, pending: true, empty: true }] : []),
 ];
 
 const next = projects[(projects.indexOf(project) + 1) % projects.length];
-const screenshots = project.screenshots ?? [];
 ---
 
 <Base
@@ -65,10 +99,21 @@ const screenshots = project.screenshots ?? [];
         <h1>{project.title[locale]}</h1>
         <p class="summary">{project.summary[locale]}</p>
         {
-          project.demoUrl && project.demoLabel && (
-            <a class="btn btn--primary play" href={project.demoUrl} target="_blank" rel="noopener noreferrer">
-              {project.demoLabel[locale]} <span aria-hidden="true">↗</span>
-            </a>
+          (project.demoUrl || project.repoUrl) && (
+            <div class="actions">
+              {project.demoUrl && (
+                <a class="btn btn--primary play" href={project.demoUrl} target="_blank" rel="noopener noreferrer">
+                  {project.demoLabel?.[locale] ?? t.project.openDemo} <span aria-hidden="true">↗</span>
+                  <span class="visually-hidden">{t.project.newTab}</span>
+                </a>
+              )}
+              {project.repoUrl && (
+                <a class="btn btn--ghost" href={project.repoUrl} target="_blank" rel="noopener noreferrer">
+                  {t.project.viewCode} <span aria-hidden="true">↗</span>
+                  <span class="visually-hidden">{t.project.newTab}</span>
+                </a>
+              )}
+            </div>
           )
         }
 
@@ -95,59 +140,124 @@ const screenshots = project.screenshots ?? [];
         {!project.image && <figcaption>{t.projects.placeholderNote}</figcaption>}
       </figure>
 
+      {
+        facts.length > 0 && (
+          <section class="facts" aria-labelledby="facts-title" data-reveal>
+            <h2 class="facts-title" id="facts-title">
+              {t.project.facts}
+            </h2>
+            <ul>
+              {facts.map((fact) => (
+                <li>
+                  <strong>{fact.value}</strong>
+                  <span>{fact.label}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )
+      }
+
       <div class="chapters">
         {
           chapters.map((chapter, index) => (
-            <section class="chapter" data-reveal>
+            <section class:list={['chapter', { 'chapter--wide': chapter.wide }]} data-reveal>
               <h2>
                 <span aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
                 {chapter.title}
               </h2>
-              {chapter.list ? (
-                <ul class="features">
+              {chapter.groups ? (
+                <div class:list={['groups', { 'groups--three': chapter.groups.length % 3 === 0 || chapter.groups.length === 5 }]}>
+                  {chapter.groups.map((group) => (
+                    <div class="group">
+                      <h3>{group.title}</h3>
+                      <ul class="features">
+                        {group.items.map((item) => (
+                          <li>{item}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              ) : chapter.list ? (
+                <ul class="features features--two">
                   {chapter.list.map((item) => (
                     <li>{item}</li>
                   ))}
                 </ul>
+              ) : chapter.gallery ? (
+                // Each picture links to its large version, so the gallery works without
+                // JavaScript; with it, the link opens the lightbox below instead.
+                <ul class="gallery">
+                  {gallery.map((shot) => (
+                    <li>
+                      <figure>
+                        <a class="thumb" href={shot.full} data-gallery-item data-caption={shot.alt[locale]}>
+                          {project.pixelArt ? (
+                            <img
+                              class="pixel"
+                              src={shot.src.src}
+                              width={shot.src.width}
+                              height={shot.src.height}
+                              alt={shot.alt[locale]}
+                              loading="lazy"
+                              decoding="async"
+                            />
+                          ) : (
+                            <Image
+                              src={shot.src}
+                              alt={shot.alt[locale]}
+                              widths={[640, 1024, 1600]}
+                              sizes="(min-width: 800px) 50vw, 100vw"
+                            />
+                          )}
+                          <span class="zoom" aria-hidden="true">
+                            <svg viewBox="0 0 24 24">
+                              <path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7" />
+                            </svg>
+                          </span>
+                          <span class="visually-hidden">{t.project.galleryOpen}</span>
+                        </a>
+                        {/* The caption repeats the alt text, so screen readers skip it. */}
+                        <figcaption aria-hidden="true">{shot.alt[locale]}</figcaption>
+                      </figure>
+                    </li>
+                  ))}
+                </ul>
               ) : (
-                <p class:list={{ pending: chapter.pending }}>{chapter.text}</p>
+                <p class:list={{ pending: chapter.pending, empty: chapter.empty }}>{chapter.text}</p>
               )}
             </section>
           ))
         }
-
-        <section class="chapter" data-reveal>
-          <h2>
-            <span aria-hidden="true">{String(chapters.length + 1).padStart(2, '0')}</span>
-            {t.project.screenshots}
-          </h2>
-          {
-            screenshots.length > 0 ? (
-              <div class="shots">
-                {screenshots.map((shot) =>
-                  project.pixelArt ? (
-                    <img
-                      class="pixel"
-                      src={shot.src.src}
-                      width={shot.src.width}
-                      height={shot.src.height}
-                      alt={shot.alt[locale]}
-                      loading="lazy"
-                      decoding="async"
-                    />
-                  ) : (
-                    <Image src={shot.src} alt={shot.alt[locale]} widths={[640, 1024, 1600]} sizes="(min-width: 900px) 60vw, 100vw" />
-                  ),
-                )}
-              </div>
-            ) : (
-              <p class="pending empty">
-                {project.category === 'tool' && !project.demoUrl ? t.project.screenshotsConsole : t.project.screenshotsPending}
-              </p>
-            )
-          }
-        </section>
       </div>
+
+      {
+        gallery.length > 0 && (
+          <dialog class="lightbox" aria-label={t.project.screenshots} data-lightbox data-count={t.project.galleryCount}>
+            <div class="lb-frame">
+              <img class:list={{ pixel: project.pixelArt }} alt="" data-lightbox-image />
+            </div>
+            <div class="lb-bar">
+              <p class="lb-caption">
+                <span class="lb-count" data-lightbox-count />
+                <span data-lightbox-caption />
+              </p>
+              <div class="lb-controls">
+                <button type="button" class="lb-btn" aria-label={t.project.galleryPrev} data-lightbox-prev>
+                  <span aria-hidden="true">←</span>
+                </button>
+                <button type="button" class="lb-btn" aria-label={t.project.galleryNext} data-lightbox-next>
+                  <span aria-hidden="true">→</span>
+                </button>
+                <button type="button" class="lb-btn" aria-label={t.project.galleryClose} data-lightbox-close>
+                  <span aria-hidden="true">✕</span>
+                </button>
+              </div>
+            </div>
+          </dialog>
+        )
+      }
 
       <nav class="after" aria-label={t.project.next}>
         <a class="next" href={projectPath(locale, next.slug)}>
@@ -162,6 +272,59 @@ const screenshots = project.screenshots ?? [];
     </div>
   </article>
 </Base>
+
+<script>
+  // Lightbox for the screenshot gallery. Without JavaScript the links open the images directly.
+  const dialog = document.querySelector<HTMLDialogElement>('[data-lightbox]');
+  const items = [...document.querySelectorAll<HTMLAnchorElement>('[data-gallery-item]')];
+
+  if (dialog && items.length > 0 && typeof dialog.showModal === 'function') {
+    const image = dialog.querySelector<HTMLImageElement>('[data-lightbox-image]')!;
+    const caption = dialog.querySelector<HTMLElement>('[data-lightbox-caption]')!;
+    const count = dialog.querySelector<HTMLElement>('[data-lightbox-count]')!;
+    const prev = dialog.querySelector<HTMLButtonElement>('[data-lightbox-prev]')!;
+    const next = dialog.querySelector<HTMLButtonElement>('[data-lightbox-next]')!;
+    let current = 0;
+
+    const show = (index: number) => {
+      current = (index + items.length) % items.length;
+      const item = items[current];
+      image.src = item.href;
+      image.alt = item.dataset.caption ?? '';
+      caption.textContent = item.dataset.caption ?? '';
+      count.textContent = (dialog.dataset.count ?? '')
+        .replace('{n}', String(current + 1))
+        .replace('{total}', String(items.length));
+    };
+
+    prev.hidden = next.hidden = items.length < 2;
+
+    items.forEach((item, index) => {
+      item.addEventListener('click', (event) => {
+        // Let modified clicks open the image in a new tab as usual.
+        if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+        event.preventDefault();
+        show(index);
+        dialog.showModal();
+      });
+    });
+
+    prev.addEventListener('click', () => show(current - 1));
+    next.addEventListener('click', () => show(current + 1));
+    dialog.querySelector('[data-lightbox-close]')!.addEventListener('click', () => dialog.close());
+    dialog.addEventListener('keydown', (event) => {
+      if (items.length < 2) return;
+      if (event.key === 'ArrowRight') show(current + 1);
+      if (event.key === 'ArrowLeft') show(current - 1);
+    });
+    // A click on the dark backdrop closes the lightbox.
+    dialog.addEventListener('click', (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+    // Back to the picture that was last shown, so keyboard users keep their place.
+    dialog.addEventListener('close', () => items[current].focus());
+  }
+</script>
 
 <style>
   .top {
@@ -225,7 +388,10 @@ const screenshots = project.screenshots ?? [];
     color: var(--muted);
   }
 
-  .play {
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
     margin-top: 2rem;
   }
 
@@ -285,6 +451,58 @@ const screenshots = project.screenshots ?? [];
     color: var(--muted);
   }
 
+  /* ---------- At a glance ---------- */
+  .facts {
+    margin-top: clamp(1.5rem, 3vw, 2.25rem);
+  }
+
+  .facts-title {
+    display: block;
+    margin-bottom: 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 400;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--violet-soft);
+  }
+
+  .facts ul {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+    gap: 1px;
+    border-radius: var(--r-m);
+    border: 1px solid var(--line);
+    background: var(--line);
+    overflow: hidden;
+  }
+
+  .facts li {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: clamp(1.1rem, 2vw, 1.5rem);
+    background: var(--bg);
+  }
+
+  .facts strong {
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 3vw, 2.25rem);
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -0.04em;
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .facts span {
+    color: var(--muted);
+    font-size: 0.9375rem;
+    line-height: 1.4;
+  }
+
   .chapters {
     margin-top: clamp(3rem, 7vw, 6rem);
     border-bottom: 1px solid var(--line);
@@ -326,11 +544,73 @@ const screenshots = project.screenshots ?? [];
     color: var(--muted);
   }
 
+  /* Wide chapters: heading on top, content across the full width. */
+  .chapter--wide {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.75rem;
+  }
+
   .features {
     display: grid;
+    gap: 0.75rem;
+  }
+
+  .features--two {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.75rem 2.5rem;
     max-width: 46rem;
+  }
+
+  /* ---------- Feature groups ---------- */
+  /* Two columns for four groups, three for five or six, so no group is left alone in a row. */
+  .groups {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(0.75rem, 1.5vw, 1.25rem);
+  }
+
+  .groups--three {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  @media (max-width: 1000px) {
+    .groups--three {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 640px) {
+    .groups,
+    .groups--three {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .group {
+    padding: clamp(1.25rem, 2vw, 1.6rem);
+    border-radius: var(--r-m);
+    border: 1px solid var(--line);
+    background: rgb(27 26 42 / 0.55);
+    transition: border-color 0.4s var(--ease);
+  }
+
+  .group:hover {
+    border-color: var(--line-strong);
+  }
+
+  .group h3 {
+    margin-bottom: 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    line-height: 1.5;
+    text-transform: uppercase;
+    color: var(--violet-soft);
+  }
+
+  .group .features li {
+    font-size: 0.975rem;
   }
 
   .features li {
@@ -357,20 +637,197 @@ const screenshots = project.screenshots ?? [];
     font-size: 1rem;
   }
 
-  .shots {
+  /* ---------- Gallery ---------- */
+  .gallery {
     display: grid;
-    gap: 1.25rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(1rem, 2vw, 1.5rem);
   }
 
-  .shots :global(img) {
-    width: 100%;
-    height: auto;
+  /* A single picture left over in the last row takes the full width. */
+  .gallery li:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+
+  .thumb {
+    position: relative;
+    display: block;
     border-radius: var(--r-m);
     border: 1px solid var(--line);
+    overflow: hidden;
+    transition: border-color 0.4s var(--ease);
   }
 
-  .shots .pixel {
+  .thumb :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+    transition: transform 0.9s var(--ease);
+  }
+
+  .thumb .pixel,
+  .lightbox .pixel {
     image-rendering: pixelated;
+  }
+
+  .thumb:hover,
+  .thumb:focus-visible {
+    border-color: var(--violet-soft);
+  }
+
+  .thumb:hover :global(img) {
+    transform: scale(1.02);
+  }
+
+  .thumb:focus-visible {
+    outline: 2px solid var(--lime);
+    outline-offset: 3px;
+  }
+
+  .zoom {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    border: 1px solid var(--line-strong);
+    background: rgb(11 11 18 / 0.7);
+    opacity: 0;
+    transition: opacity 0.3s var(--ease);
+  }
+
+  .zoom svg {
+    width: 1rem;
+    height: 1rem;
+    fill: none;
+    stroke: var(--text);
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .thumb:hover .zoom,
+  .thumb:focus-visible .zoom {
+    opacity: 1;
+  }
+
+  /* On touch screens there is no hover, so the hint stays visible. */
+  @media (hover: none) {
+    .zoom {
+      opacity: 1;
+    }
+  }
+
+  .gallery figcaption {
+    margin-top: 0.75rem;
+    color: var(--muted);
+    font-size: 0.9375rem;
+    line-height: 1.45;
+  }
+
+  /* ---------- Lightbox ---------- */
+  .lightbox {
+    width: min(94vw, 1400px);
+    max-width: none;
+    max-height: 94vh;
+    padding: 0;
+    border-radius: var(--r-l);
+    border: 1px solid var(--line-strong);
+    background: var(--surface);
+    color: var(--text);
+    overflow: hidden;
+  }
+
+  .lightbox[open] {
+    display: flex;
+    flex-direction: column;
+    animation: lb-in 0.35s var(--ease);
+  }
+
+  .lightbox::backdrop {
+    background: rgb(5 5 10 / 0.86);
+    backdrop-filter: blur(4px);
+  }
+
+  @keyframes lb-in {
+    from {
+      opacity: 0;
+      transform: scale(0.98);
+    }
+  }
+
+  .lb-frame {
+    display: grid;
+    place-items: center;
+    min-height: 0;
+    background: #000;
+  }
+
+  .lb-frame img {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: calc(94vh - 5.5rem);
+    object-fit: contain;
+  }
+
+  .lb-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.85rem 1rem 0.85rem 1.25rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .lb-caption {
+    font-size: 0.9375rem;
+    line-height: 1.4;
+    color: var(--muted);
+  }
+
+  .lb-count {
+    margin-right: 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    color: var(--violet-soft);
+  }
+
+  .lb-controls {
+    display: flex;
+    flex: none;
+    gap: 0.5rem;
+  }
+
+  .lb-btn {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+    border: 1px solid var(--line-strong);
+    background: rgb(255 255 255 / 0.04);
+    color: var(--text);
+    font-size: 1.05rem;
+    cursor: pointer;
+    transition: border-color 0.3s var(--ease);
+  }
+
+  .lb-btn[hidden] {
+    display: none;
+  }
+
+  .lb-btn:hover {
+    border-color: var(--violet-soft);
+  }
+
+  .lb-btn:focus-visible {
+    outline: 2px solid var(--lime);
+    outline-offset: 2px;
   }
 
   .after {
@@ -447,8 +904,18 @@ const screenshots = project.screenshots ?? [];
     .meta,
     .chapter,
     .after,
-    .features {
+    .features--two,
+    .gallery {
       grid-template-columns: 1fr;
+    }
+
+    .lb-bar {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .lb-controls {
+      justify-content: flex-end;
     }
 
     .meta {

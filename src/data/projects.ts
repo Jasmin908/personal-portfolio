@@ -8,10 +8,8 @@ import mentorWorkspace from '../assets/projects/ai-coding-mentor-workspace.webp'
 import everboundBat from '../assets/projects/everbound-bat.webp';
 import everboundCave from '../assets/projects/everbound-cave.webp';
 import everboundGameplay from '../assets/projects/everbound-gameplay.webp';
+import everboundLevelStart from '../assets/projects/everbound-level-start.webp';
 import everboundMenu from '../assets/projects/everbound-menu.webp';
-import formaHero from '../assets/projects/forma-studio-hero.webp';
-import formaPricing from '../assets/projects/forma-studio-pricing.webp';
-import formaProjects from '../assets/projects/forma-studio-projects.webp';
 import habitflowCalendar from '../assets/projects/habitflow-calendar.webp';
 import habitflowDashboard from '../assets/projects/habitflow-dashboard.webp';
 import habitflowStatistics from '../assets/projects/habitflow-statistics.webp';
@@ -52,6 +50,17 @@ export interface CaseStudy {
   learnings?: string;
 }
 
+export interface Fact {
+  /** Short and verifiable, e.g. a number or a name. */
+  value: string;
+  label: string;
+}
+
+export interface FeatureGroup {
+  title: string;
+  items: string[];
+}
+
 export interface Screenshot {
   src: ImageMetadata;
   alt: Localized<string>;
@@ -90,6 +99,10 @@ export interface Project {
   summary: Localized<string>;
   /** Short list shown on the detail page. Only list what really exists. */
   features?: Localized<string[]>;
+  /** Features sorted into themes; shown instead of `features` when set. */
+  featureGroups?: Localized<FeatureGroup[]>;
+  /** "At a glance" strip on the detail page. Only facts that can be checked. */
+  facts?: Localized<Fact[]>;
   caseStudy: Localized<CaseStudy>;
 }
 
@@ -131,30 +144,88 @@ export const projects: Project[] = [
       de: 'Ein Habit-Tracker, der komplett im Browser läuft: Gewohnheiten anlegen, täglich abhaken und den Fortschritt über Serien, Statistiken und einen Kalender verfolgen. Ohne Konto, die Daten bleiben auf dem eigenen Gerät.',
       en: 'A habit tracker that runs entirely in the browser: create habits, tick them off each day, and follow your progress through streaks, statistics and a calendar. No account, and the data stays on your own device.',
     },
-    features: {
+    facts: {
       de: [
-        'Gewohnheiten anlegen, bearbeiten und löschen, mit Kategorie und Symbol',
-        'Flexible Zeitpläne: täglich oder an ausgewählten Wochentagen',
-        'Täglicher Fortschritt auf einem Dashboard mit Wochenübersicht',
-        'Serien, die nur geplante Tage zählen',
-        'Statistiken und Diagramme zu Wochen- und Monatsquoten',
-        'Interaktiver Kalender, in dem sich vergangene Tage korrigieren lassen',
-        'Dunkles und helles Design',
-        'Speicherung lokal im Browser, ohne Konto',
-        'Export und Import der Daten als JSON',
-        'Responsives Layout für Desktop und Smartphone',
+        { value: '4', label: 'Ansichten: Dashboard, Statistik, Kalender und Einstellungen' },
+        { value: '2', label: 'Diagramme zu Wochen- und Monatsquoten' },
+        { value: '39', label: 'automatisierte Tests für Daten, Zeitpläne und Statistiken' },
+        { value: 'JSON', label: 'Export und Import, die Daten bleiben im Browser' },
       ],
       en: [
-        'Create, edit and delete habits, each with a category and an icon',
-        'Flexible schedules: every day or on selected weekdays',
-        'Daily progress on a dashboard with a week overview',
-        'Streaks that only count the days a habit was scheduled for',
-        'Statistics and charts for weekly and monthly completion',
-        'An interactive calendar where past days can be corrected',
-        'Dark and light themes',
-        'Data stored locally in the browser, with no account',
-        'JSON export and import',
-        'Responsive layout for desktop and phones',
+        { value: '4', label: 'views: dashboard, statistics, calendar and settings' },
+        { value: '2', label: 'charts for weekly and monthly completion' },
+        { value: '39', label: 'automated tests for data, schedules and statistics' },
+        { value: 'JSON', label: 'export and import, with the data kept in the browser' },
+      ],
+    },
+    featureGroups: {
+      de: [
+        {
+          title: 'Dashboard',
+          items: [
+            'Gewohnheiten anlegen, bearbeiten und löschen, mit Kategorie und Symbol',
+            'Flexible Zeitpläne: täglich oder an ausgewählten Wochentagen',
+            'Täglicher Fortschritt mit Wochenübersicht',
+          ],
+        },
+        {
+          title: 'Statistiken & Serien',
+          items: [
+            'Aktuelle und beste Serie pro Gewohnheit, nur geplante Tage zählen',
+            'Wochen- und Monatsquoten',
+            'Zwei Diagramme mit Chart.js, erst beim Öffnen der Seite geladen',
+          ],
+        },
+        {
+          title: 'Kalender',
+          items: [
+            'Monatsansicht, die jeden Tag als erledigt, teilweise erledigt oder verpasst zeigt',
+            'Vergangene Tage lassen sich nachträglich korrigieren',
+          ],
+        },
+        {
+          title: 'Daten & Oberfläche',
+          items: [
+            'Speicherung lokal im Browser, ohne Konto',
+            'Export und Import der Daten als JSON',
+            'Dunkles und helles Design',
+            'Responsives Layout für Desktop und Smartphone',
+          ],
+        },
+      ],
+      en: [
+        {
+          title: 'Dashboard',
+          items: [
+            'Create, edit and delete habits, each with a category and an icon',
+            'Flexible schedules: every day or on selected weekdays',
+            'Daily progress with a week overview',
+          ],
+        },
+        {
+          title: 'Statistics & streaks',
+          items: [
+            'Current and best streak for each habit, counting only scheduled days',
+            'Weekly and monthly completion rates',
+            'Two charts with Chart.js, loaded only when the page is opened',
+          ],
+        },
+        {
+          title: 'Calendar',
+          items: [
+            'A month view that shows every day as done, partly done or missed',
+            'Past days can be corrected afterwards',
+          ],
+        },
+        {
+          title: 'Data & interface',
+          items: [
+            'Data stored locally in the browser, with no account',
+            'JSON export and import',
+            'Dark and light themes',
+            'Responsive layout for desktop and phones',
+          ],
+        },
       ],
     },
     caseStudy: {
@@ -162,11 +233,11 @@ export const projects: Project[] = [
         overview:
           'HabitFlow ist ein Habit-Tracker mit vier Ansichten: einem Dashboard für den Tag, einer Statistikseite, einem Monatskalender und den Einstellungen. Die Anwendung ist veröffentlicht und läuft vollständig im Browser.',
         problem:
-          'Viele Habit-Tracker zeigen vor allem eine Reihe von Häkchen. Daraus lässt sich schwer ablesen, wie regelmässig man wirklich dranbleibt – besonders bei Gewohnheiten, die nicht jeden Tag anstehen.',
+          'Neue Gewohnheiten entstehen im Alltag nebenbei, und genau dort verliert man sie leicht aus den Augen. Viele Habit-Tracker zeigen vor allem eine Reihe von Häkchen. Daraus lässt sich schwer ablesen, wie regelmässig man wirklich dranbleibt – besonders bei Gewohnheiten, die nicht jeden Tag anstehen.',
         solution:
           'HabitFlow verbindet eine schlichte tägliche Erfassung mit Auswertungen über längere Zeit: Serien pro Gewohnheit, Wochen- und Monatsquoten, zwei Diagramme und ein Kalender, der jeden Tag als erledigt, teilweise erledigt oder verpasst zeigt. Gezählt werden nur Tage, an denen eine Gewohnheit geplant war.',
         implementation:
-          'Die Anwendung ist in JavaScript mit ES-Modulen geschrieben, ohne Framework, und wird mit Vite gebaut. Die Logik für Daten, Zeitpläne und Statistiken ist von der Darstellung getrennt und wird mit dem Test-Runner von Node geprüft. Chart.js wird erst geladen, wenn die Statistikseite geöffnet wird. Gespeichert wird im localStorage des Browsers; die Daten lassen sich als JSON exportieren und wieder importieren.',
+          'Die Anwendung ist in JavaScript mit ES-Modulen geschrieben, ohne Framework, und wird mit Vite gebaut. Die Logik für Daten, Zeitpläne und Statistiken ist von der Darstellung getrennt und wird mit 39 automatisierten Tests auf dem Test-Runner von Node geprüft. Chart.js wird erst geladen, wenn die Statistikseite geöffnet wird. Gespeichert wird im localStorage des Browsers; die Daten lassen sich als JSON exportieren und wieder importieren.',
         challenges:
           'Am meisten Sorgfalt brauchten die Datumslogik und die Zeitpläne. Tage richten sich nach dem lokalen Kalender statt nach UTC, damit sich ein Eintrag um Mitternacht nicht verschiebt. Und wenn man die Wochentage einer Gewohnheit ändert, darf das die Vergangenheit nicht umschreiben: Jede Gewohnheit führt deshalb einen Verlauf ihrer Zeitpläne.',
         learnings:
@@ -176,11 +247,11 @@ export const projects: Project[] = [
         overview:
           'HabitFlow is a habit tracker with four views: a dashboard for the day, a statistics page, a monthly calendar and settings. The application is released and runs entirely in the browser.',
         problem:
-          "Many habit trackers mostly show a row of check marks. That makes it hard to see how consistently you are really keeping up, especially with habits that aren't due every day.",
+          "New habits are built on the side of everyday life, which is exactly where they are easy to lose sight of. Many habit trackers mostly show a row of check marks. That makes it hard to see how consistently you are really keeping up, especially with habits that aren't due every day.",
         solution:
           'HabitFlow combines a simple daily log with a view over longer periods: a streak for each habit, weekly and monthly completion rates, two charts, and a calendar that shows every day as done, partly done or missed. Only the days a habit was scheduled for are counted.',
         implementation:
-          "The application is written in JavaScript with ES modules, without a framework, and built with Vite. The logic for dates, schedules and statistics is kept separate from the interface and is checked with Node's test runner. Chart.js is only loaded when the statistics page is opened. Data is stored in the browser's localStorage and can be exported and imported as JSON.",
+          "The application is written in JavaScript with ES modules, without a framework, and built with Vite. The logic for dates, schedules and statistics is kept separate from the interface and is checked by 39 automated tests on Node's test runner. Chart.js is only loaded when the statistics page is opened. Data is stored in the browser's localStorage and can be exported and imported as JSON.",
         challenges:
           "The date logic and the schedules needed the most care. Days follow the local calendar instead of UTC, so an entry doesn't shift around midnight. And changing a habit's weekdays must not rewrite the past, so each habit keeps a history of its schedules.",
         learnings:
@@ -225,30 +296,86 @@ export const projects: Project[] = [
       de: 'Eine Lern-Webanwendung für alle, die programmieren lernen: Code in einem echten Editor schreiben, ihn von einem simulierten Mentor erklären lassen, Hinweise holen und mit 18 Übungen in Python, JavaScript und Java üben. Der Mentor arbeitet mit festen Regeln, nicht mit einem KI-Modell.',
       en: 'A learning web application for programming beginners: write code in a real editor, have a simulated mentor explain it, ask for hints, and practise with 18 exercises in Python, JavaScript and Java. The mentor works with fixed rules, not with an AI model.',
     },
-    features: {
+    facts: {
       de: [
-        'Code-Editor (Monaco) mit Syntaxhervorhebung für Python, JavaScript und Java',
-        'Erklären: beschreibt bei erkannten Mustern, was ein Programm tut, und erläutert die verwendeten Konzepte',
-        'Debuggen: sucht nach 16 typischen Anfängerfehlern und begründet jeden Fund',
-        'Hinweise in drei Stufen, vom kleinen Anstoss bis zum konkreten Vorschlag',
-        'Übungsbibliothek mit 18 Aufgaben, filterbar nach Sprache, Schwierigkeit und Thema',
-        'Übungsansicht mit Aufgabe, Startcode, Anforderungsprüfung und eigenen Hinweisen pro Übung',
-        'Rückmeldung in drei Kategorien: erkannt, nicht erkannt, nicht überprüfbar',
-        'Entwürfe pro Sprache und pro Übung, lokal im Browser gespeichert',
-        'Seite «How the demo works», die offenlegt, was der Mentor erkennt und was nicht',
-        'Responsives Layout mit einklappbarer Seitenleiste',
+        { value: '3', label: 'Sprachen im Editor: Python, JavaScript und Java' },
+        { value: '18', label: 'Übungen, filterbar nach Sprache, Schwierigkeit und Thema' },
+        { value: '16', label: 'typische Anfängerfehler, nach denen «Debuggen» sucht' },
+        { value: '335', label: 'automatisierte Tests mit Vitest und React Testing Library' },
       ],
       en: [
-        'Code editor (Monaco) with syntax highlighting for Python, JavaScript and Java',
-        'Explain: describes what a program does where it recognises the pattern, and explains the concepts used',
-        'Debug: looks for 16 typical beginner mistakes and gives a reason for each finding',
-        'Hints in three levels, from a gentle nudge to a concrete suggestion',
-        'Exercise library with 18 tasks, filterable by language, difficulty and topic',
-        'Practice view with the task, starter code, a requirement check and hints written for each exercise',
-        'Feedback in three categories: recognised, not recognised, not verifiable',
-        'Drafts for each language and each exercise, stored locally in the browser',
-        'A "How the demo works" page that discloses what the mentor recognises and what it does not',
-        'Responsive layout with a collapsible sidebar',
+        { value: '3', label: 'languages in the editor: Python, JavaScript and Java' },
+        { value: '18', label: 'exercises, filterable by language, difficulty and topic' },
+        { value: '16', label: 'typical beginner mistakes that Debug looks for' },
+        { value: '335', label: 'automated tests with Vitest and React Testing Library' },
+      ],
+    },
+    featureGroups: {
+      de: [
+        {
+          title: 'Editor',
+          items: [
+            'Monaco, der Editor von Visual Studio Code, mit Syntaxhervorhebung für Python, JavaScript und Java',
+            'Entwürfe pro Sprache und pro Übung, lokal im Browser gespeichert',
+            'Responsives Layout mit einklappbarer Seitenleiste',
+          ],
+        },
+        {
+          title: 'Erklären, Debuggen, Hinweise',
+          items: [
+            'Erklären: beschreibt bei erkannten Mustern, was ein Programm tut, und erläutert die verwendeten Konzepte',
+            'Debuggen: sucht nach 16 typischen Anfängerfehlern und begründet jeden Fund',
+            'Hinweise in drei Stufen, vom kleinen Anstoss bis zum konkreten Vorschlag',
+          ],
+        },
+        {
+          title: 'Übungen',
+          items: [
+            'Bibliothek mit 18 Aufgaben, filterbar nach Sprache, Schwierigkeit und Thema',
+            'Übungsansicht mit Aufgabe, Startcode, Anforderungsprüfung und eigenen Hinweisen',
+            'Rückmeldung in drei Kategorien: erkannt, nicht erkannt, nicht überprüfbar',
+          ],
+        },
+        {
+          title: 'Ehrlich statt magisch',
+          items: [
+            'Feste, nachvollziehbare Regeln statt eines KI-Modells: gleicher Code, gleiche Antwort',
+            'Seite «How the demo works», die offenlegt, was der Mentor erkennt und was nicht',
+          ],
+        },
+      ],
+      en: [
+        {
+          title: 'Editor',
+          items: [
+            'Monaco, the editor from Visual Studio Code, with syntax highlighting for Python, JavaScript and Java',
+            'Drafts for each language and each exercise, stored locally in the browser',
+            'Responsive layout with a collapsible sidebar',
+          ],
+        },
+        {
+          title: 'Explain, debug, hints',
+          items: [
+            'Explain: describes what a program does where it recognises the pattern, and explains the concepts used',
+            'Debug: looks for 16 typical beginner mistakes and gives a reason for each finding',
+            'Hints in three levels, from a gentle nudge to a concrete suggestion',
+          ],
+        },
+        {
+          title: 'Exercises',
+          items: [
+            'A library of 18 tasks, filterable by language, difficulty and topic',
+            'Practice view with the task, starter code, a requirement check and hints of its own',
+            'Feedback in three categories: recognised, not recognised, not verifiable',
+          ],
+        },
+        {
+          title: 'Honest, not magic',
+          items: [
+            'Fixed, transparent rules instead of an AI model: the same code gets the same answer',
+            'A "How the demo works" page that discloses what the mentor recognises and what it does not',
+          ],
+        },
       ],
     },
     caseStudy: {
@@ -307,6 +434,13 @@ export const projects: Project[] = [
         },
       },
       {
+        src: everboundLevelStart,
+        alt: {
+          de: 'Spielszene aus Everbound am Anfang des Levels: die Spielfigur links, daneben ein Stachelfeld und eine schwebende Plattform mit Münzen',
+          en: 'Gameplay scene from Everbound at the start of the level: the player character on the left, next to a field of spikes and a floating platform with coins',
+        },
+      },
+      {
         src: everboundBat,
         alt: {
           de: 'Spielszene aus Everbound: Die Spielfigur springt in der Höhle, links fliegt eine Fledermaus, rechts schweben Münzen',
@@ -332,32 +466,88 @@ export const projects: Project[] = [
       de: 'Ein Fantasy-Plattformer in Pixel-Art, entwickelt mit Godot: durch eine Höhle laufen und springen, Münzen sammeln, Gegnern und Fallen ausweichen und Kristallsplitter finden. Ein spielbarer Prototyp, der direkt im Browser läuft, mit Tastatur oder Touch.',
       en: 'A fantasy platformer in pixel art, built with Godot: run and jump through a cave, collect coins, avoid enemies and traps, and find crystal shards. A playable prototype that runs directly in the browser, with keyboard or touch.',
     },
-    features: {
+    facts: {
       de: [
-        'Laufen und Springen mit eigener Bewegungsphysik',
-        'Nahkampfangriff mit eigener Trefferzone',
-        'Lebenssystem mit Herzen, Rückstoss bei Treffern und Respawn',
-        'Sammelbare Münzen mit Zähler',
-        'Truhen, aus denen Kristallsplitter erscheinen',
-        'Gegner und Hindernisse wie Fledermäuse, Stacheln und Pfeile',
-        'Bewegliche Plattformen und Sprungfelder',
-        'Mitlaufende Kamera und Parallax-Hintergründe',
-        'Level-Übergänge mit Überblendung und Abschlussbildschirm mit Punktzahl',
-        'Hauptmenü und Einstellungen mit Lautstärkeregler',
-        'Steuerung per Tastatur oder Touch-Buttons',
+        { value: 'Godot 4.5', label: 'Engine, programmiert in GDScript' },
+        { value: 'Web', label: 'im Browser spielbar, ohne Installation' },
+        { value: 'Tastatur & Touch', label: 'Steuerung am Computer und auf dem Smartphone' },
+        { value: '≈ 43 MB', label: 'Download beim ersten Aufruf' },
       ],
       en: [
-        'Running and jumping with custom movement physics',
-        'A melee attack with its own hitbox',
-        'A health system with hearts, knockback when hit, and respawning',
-        'Collectible coins with a counter',
-        'Chests that release crystal shards',
-        'Enemies and hazards such as bats, spikes and arrows',
-        'Moving platforms and jump pads',
-        'A camera that follows the player, and parallax backgrounds',
-        'Level transitions with fades, and a completion screen with a score',
-        'A main menu and settings with a volume slider',
-        'Keyboard controls or on-screen touch buttons',
+        { value: 'Godot 4.5', label: 'engine, programmed in GDScript' },
+        { value: 'Web', label: 'playable in the browser, with nothing to install' },
+        { value: 'Keyboard & touch', label: 'controls on a computer and on a phone' },
+        { value: '≈ 43 MB', label: 'download on the first visit' },
+      ],
+    },
+    featureGroups: {
+      de: [
+        {
+          title: 'Bewegung & Kampf',
+          items: [
+            'Laufen und Springen mit eigener Bewegungsphysik und Schwerkraft',
+            'Nahkampfangriff mit eigener Trefferzone',
+            'Drei Herzen, Rückstoss bei Treffern und Respawn am Ausgangspunkt',
+          ],
+        },
+        {
+          title: 'Gegner & Gefahren',
+          items: ['Fledermäuse als Gegner', 'Stacheln und Pfeile als Fallen'],
+        },
+        {
+          title: 'Sammelobjekte',
+          items: ['Münzen mit Zähler in der Anzeige', 'Truhen, aus denen Kristallsplitter erscheinen'],
+        },
+        {
+          title: 'Level & Fortschritt',
+          items: [
+            'Bewegliche Plattformen und Sprungfelder',
+            'Mitlaufende Kamera und Parallax-Hintergründe',
+            'Level-Übergänge mit Überblendung',
+            'Abschlussbildschirm, der Münzen, Zeit und Tode zu einer Punktzahl zusammenfasst',
+          ],
+        },
+        {
+          title: 'Menüs & Steuerung',
+          items: [
+            'Hauptmenü und Einstellungen mit Lautstärkeregler',
+            'Tastatur oder Touch-Buttons, die auf Touch-Geräten erscheinen und bei Tastendruck verschwinden',
+          ],
+        },
+      ],
+      en: [
+        {
+          title: 'Movement & combat',
+          items: [
+            'Running and jumping with custom movement physics and gravity',
+            'A melee attack with its own hitbox',
+            'Three hearts, knockback when hit, and respawning at the starting point',
+          ],
+        },
+        {
+          title: 'Enemies & hazards',
+          items: ['Bats as enemies', 'Spikes and arrows as traps'],
+        },
+        {
+          title: 'Collectibles',
+          items: ['Coins with a counter in the display', 'Chests that release crystal shards'],
+        },
+        {
+          title: 'Levels & progress',
+          items: [
+            'Moving platforms and jump pads',
+            'A camera that follows the player, and parallax backgrounds',
+            'Level transitions with fades',
+            'A completion screen that combines coins, time and deaths into a score',
+          ],
+        },
+        {
+          title: 'Menus & controls',
+          items: [
+            'A main menu and settings with a volume slider',
+            'Keyboard or touch buttons that appear on touch devices and disappear when a key is pressed',
+          ],
+        },
       ],
     },
     caseStudy: {
@@ -392,97 +582,6 @@ export const projects: Project[] = [
           'Everbound is a prototype. In the browser version, the beginning of the first level has been tested; further areas exist in the project but have not been fully checked, and a third level is only an empty scene so far. The game does not save progress. The first visit downloads about 43 MB. Testing was done in a Chromium browser; real phones and other browsers have not been tested yet.',
         learnings:
           'The project shows that a game consists of many small systems that only become fun together, and that giving each element its own scene keeps those systems manageable. It also shows that publishing in the browser is a step of its own: what works on the desktop has to be checked again there.',
-      },
-    },
-  },
-  {
-    slug: 'forma-studio',
-    status: 'completed',
-    category: 'website',
-    featured: true,
-    cover: 'grid',
-    accent: 'lime',
-    image: formaHero,
-    imageAlt: {
-      de: 'Startseite von Forma Studio: dunkler Hintergrund mit violettem Farbverlauf, Schlagzeile «Websites für Firmen mit Ambitionen» und zwei Buttons',
-      en: 'Forma Studio home page: a dark background with a violet gradient, the headline "Websites für Firmen mit Ambitionen" and two buttons',
-    },
-    screenshots: [
-      {
-        src: formaProjects,
-        alt: {
-          de: 'Projektbereich von Forma Studio mit drei Konzeptprojekten: Café Lumière, NOVA Studio und ATELIER 27',
-          en: 'Forma Studio projects section with three concept projects: Café Lumière, NOVA Studio and ATELIER 27',
-        },
-      },
-      {
-        src: formaPricing,
-        alt: {
-          de: 'Preisbereich von Forma Studio mit Einstiegspreisen für neue und bestehende Websites und einem Hinweis zu Domain und Hosting',
-          en: 'Forma Studio pricing section with starting prices for new and existing websites, and a note on domain and hosting',
-        },
-      },
-    ],
-    stack: ['Astro', 'HTML', 'CSS', 'JavaScript', 'Netlify Forms'],
-    demoUrl: 'https://forma-webdesign.netlify.app/',
-    demoLabel: { de: 'Website ansehen', en: 'Visit website' },
-    repoUrl: 'https://github.com/Jasmin908/forma-studio',
-    title: { de: 'Forma Studio', en: 'Forma Studio' },
-    tagline: { de: 'Website für mein Webdesign-Studio', en: 'Website for my web design studio' },
-    summary: {
-      de: 'Die zweisprachige Website von Forma Studio, meinem Webdesign-Angebot für kleine Unternehmen in der Schweiz: Leistungen, Einstiegspreise, der Ablauf eines Projekts, drei Konzept-Websites und ein Kontaktformular.',
-      en: 'The bilingual website of Forma Studio, my web design offer for small businesses in Switzerland: services, starting prices, how a project runs, three concept websites and a contact form.',
-    },
-    features: {
-      de: [
-        'Zweisprachig: Deutsch als Hauptsprache, Englisch unter /en/',
-        'Responsives Layout für Desktop, Tablet und Smartphone',
-        'Leistungen und Preisliste, pro Sprache einmal definiert und in Leistungen, Preisen und Kontaktformular wiederverwendet',
-        'Ablauf eines Projekts in fünf Schritten',
-        'Portfolio mit drei Konzept-Websites für erfundene Unternehmen, jede mit eigener Live-Demo',
-        'Kontaktformular über Netlify Forms, mit Honeypot-Feld und Mindestzeit gegen Spam',
-        'Animationen beim Scrollen und dezente Hintergrundbewegungen, reduziert bei «Bewegung reduzieren»',
-        'Impressum und Datenschutzerklärung in beiden Sprachen',
-      ],
-      en: [
-        'Bilingual: German as the main language, English under /en/',
-        'Responsive layout for desktop, tablet and phone',
-        'Services and a price list, defined once per language and reused by the services, the prices and the contact form',
-        'How a project runs, in five steps',
-        'A portfolio of three concept websites for fictional businesses, each with its own live demo',
-        'A contact form through Netlify Forms, with a honeypot field and a minimum time against spam',
-        'Scroll animations and subtle background motion, reduced when "reduce motion" is set',
-        'Legal notice and privacy policy in both languages',
-      ],
-    },
-    caseStudy: {
-      de: {
-        overview:
-          'Forma Studio ist mein Webdesign-Angebot für kleine Unternehmen in der Schweiz, und diese Website stellt es vor. Sie ist veröffentlicht und zeigt Leistungen, Preise, den Ablauf eines Projekts und drei Konzept-Websites. Anfragen kommen über ein Kontaktformular.',
-        problem:
-          'Wer ein Webdesign-Angebot startet, hat noch keine Kundenprojekte, die sich zeigen lassen. Gleichzeitig wollen Interessierte schnell sehen, was es kostet, wie die Zusammenarbeit abläuft und wie die Ergebnisse aussehen.',
-        solution:
-          'Die Website beantwortet diese Fragen auf einer Seite: Leistungen mit Einstiegspreisen, ein Ablauf in fünf Schritten und ein Portfolio. Statt Kundenarbeiten zeigt das Portfolio drei Konzept-Websites für erfundene Unternehmen aus Gastronomie, Beauty und Architektur. Sie sind klar als Konzeptprojekte gekennzeichnet.',
-        implementation:
-          'Die Website ist mit Astro gebaut und wird als statische Seite auf Netlify veröffentlicht. Alle Texte liegen pro Sprache in einer eigenen Datei; Leistungen und Preise sind dort einmal definiert und speisen den Leistungsbereich, die Preisliste und die Auswahl im Kontaktformular. Das Formular läuft über Netlify Forms und braucht keine API-Schlüssel. Browser-Icons und Bilder für das Teilen in sozialen Netzwerken erzeugt ein eigenes Skript. Die Website wurde mit Unterstützung von Claude Code entwickelt.',
-        challenges:
-          'Wichtig war, ehrlich zu bleiben: keine erfundenen Kunden, Bewertungen oder Erfahrungen, und Konzeptprojekte nie als Kundenaufträge darstellen. Dazu kam der Spamschutz ohne Captcha und ohne zusätzliche Dienste, gelöst mit einem versteckten Feld, einer Mindestzeit vor dem Absenden und dem Filter von Netlify.',
-        limitations:
-          'Das Kontaktformular funktioniert nur auf der veröffentlichten Website; in der lokalen Vorschau prüft es die Eingaben, sendet aber nichts. Das Portfolio enthält bisher nur Konzeptprojekte.',
-      },
-      en: {
-        overview:
-          'Forma Studio is my web design offer for small businesses in Switzerland, and this website presents it. It is published and shows the services, prices, how a project runs and three concept websites. Enquiries come in through a contact form.',
-        problem:
-          'Starting a web design offer means having no client projects to show yet. At the same time, people want to see quickly what it costs, how working together runs and what the results look like.',
-        solution:
-          'The website answers these questions on one page: services with starting prices, a process in five steps and a portfolio. Instead of client work, the portfolio shows three concept websites for fictional businesses in hospitality, beauty and architecture, clearly marked as concept projects.',
-        implementation:
-          'The website is built with Astro and published as a static site on Netlify. All texts live in one file per language; services and prices are defined there once and feed the services section, the price list and the choice in the contact form. The form runs through Netlify Forms and needs no API keys. A script of its own generates the browser icons and the images for sharing on social networks. The website was developed with assistance from Claude Code.',
-        challenges:
-          'Staying honest mattered most: no invented clients, reviews or experience, and concept projects never presented as client work. Spam protection was another point, without a captcha or extra services: a hidden field, a minimum time before sending and the Netlify filter.',
-        limitations:
-          'The contact form only works on the published website; in the local preview it checks the entries but sends nothing. So far the portfolio contains concept projects only.',
       },
     },
   },

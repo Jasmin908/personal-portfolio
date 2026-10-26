@@ -41,6 +41,19 @@ const t = useTranslations(locale);
     background: var(--muted);
   }
 
+  /* The outline repeats the dot colour, so the status reads at a glance. */
+  [data-status='completed'] {
+    border-color: rgb(182 243 106 / 0.5);
+  }
+
+  [data-status='prototype'] {
+    border-color: rgb(59 130 246 / 0.65);
+  }
+
+  [data-status='planned'] {
+    border-style: dashed;
+  }
+
   [data-status='completed'] i,
   [data-status='in-development'] i {
     background: var(--lime);
