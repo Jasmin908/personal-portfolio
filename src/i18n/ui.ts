@@ -138,6 +138,10 @@ const de = {
     title: 'Womit ich arbeite',
     intro:
       'Technologien, die ich in der Ausbildung und in eigenen Projekten einsetze. Bewusst ohne Prozentbalken: Was ich kann, zeigen die Projekte besser als eine Zahl.',
+    exploring: {
+      title: 'Aktuell am Lernen',
+      subtitle: 'Themen und Technologien, mit denen ich mich momentan beschäftige.',
+    },
   },
   beyond: {
     label: 'Neben dem Code',
@@ -322,6 +326,10 @@ const en: Dictionary = {
     title: 'What I work with',
     intro:
       'Technologies I use in my apprenticeship and in my own projects. No percentage bars on purpose: the projects say more about what I can do than a number would.',
+    exploring: {
+      title: 'Currently Exploring',
+      subtitle: "A few things I'm currently learning and getting better at.",
+    },
   },
   beyond: {
     label: 'Beyond code',

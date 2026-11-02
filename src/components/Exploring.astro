@@ -1,0 +1,151 @@
+---
+import SkillIcon from './SkillIcon.astro';
+import { exploring } from '../data/skills';
+import type { Locale } from '../i18n/config';
+import { useTranslations } from '../i18n/ui';
+
+/** "Currently exploring": topics being learned right now, shown below the skill cards. */
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+---
+
+<div class="exploring" role="group" aria-labelledby="exploring-title">
+  <header class="head" data-reveal>
+    <h3 id="exploring-title">{t.skills.exploring.title}</h3>
+    <p>{t.skills.exploring.subtitle}</p>
+  </header>
+
+  <ul class="topics">
+    {
+      exploring.map((topic, index) => (
+        <li class="topic" data-reveal style={`--d: ${index * 70}ms`}>
+          <div class="topic-head">
+            <SkillIcon name={topic.icon} />
+            <span class="status">{topic.status[locale]}</span>
+          </div>
+          <h4>{topic.title[locale]}</h4>
+          <p>{topic.description[locale]}</p>
+        </li>
+      ))
+    }
+  </ul>
+</div>
+
+<style>
+  .exploring {
+    margin-top: clamp(3rem, 6vw, 4.5rem);
+  }
+
+  /* Same pattern as the group headings in the projects section. */
+  h3 {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    line-height: 1.5;
+    text-transform: uppercase;
+    color: var(--violet-soft);
+  }
+
+  h3::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--line);
+  }
+
+  .head p {
+    margin-top: 0.75rem;
+    max-width: 40rem;
+    color: var(--muted);
+  }
+
+  .topics {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(0.75rem, 1.5vw, 1.25rem);
+    margin-top: clamp(1.5rem, 3vw, 2rem);
+  }
+
+  .topic {
+    padding: clamp(1.25rem, 2vw, 1.75rem);
+    border-radius: var(--r-m);
+    border: 1px solid var(--line);
+    background: rgb(27 26 42 / 0.55);
+    /* Opacity and transform repeat the scroll-reveal timing from global.css. */
+    transition:
+      border-color 0.5s var(--ease),
+      opacity 0.9s var(--ease) var(--d, 0ms),
+      transform 0.9s var(--ease) var(--d, 0ms);
+  }
+
+  .topic:hover {
+    border-color: rgb(196 181 253 / 0.4);
+  }
+
+  .topic:hover :global(.icon) {
+    background: rgb(139 92 246 / 0.24);
+    border-color: var(--violet-soft);
+    color: var(--text);
+  }
+
+  .topic-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  /* Small and understated: a learning stage, not a proficiency level. */
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.25rem 0.65rem;
+    border-radius: var(--pill);
+    border: 1px solid var(--line-strong);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.06em;
+    line-height: 1.4;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .status::before {
+    content: '';
+    width: 0.4rem;
+    height: 0.4rem;
+    border-radius: 50%;
+    background: var(--lime);
+  }
+
+  h4 {
+    margin: 1.4rem 0 0;
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+  }
+
+  .topic p {
+    margin-top: 0.6rem;
+    color: var(--muted);
+    font-size: 0.975rem;
+    line-height: 1.55;
+  }
+
+  @media (max-width: 900px) {
+    .topics {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

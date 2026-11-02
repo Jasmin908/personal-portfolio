@@ -20,6 +20,14 @@ export interface ToolGroup {
   subgroups: SkillSubgroup[];
 }
 
+export interface ExploringTopic {
+  icon: IconName;
+  title: Localized<string>;
+  /** A learning stage such as "Learning", never a proficiency level. */
+  status: Localized<string>;
+  description: Localized<string>;
+}
+
 /** One card per group. Add a technology by adding its name to `items`. */
 export const skillGroups: SkillGroup[] = [
   {
@@ -74,3 +82,37 @@ export const tools: ToolGroup = {
     },
   ],
 };
+
+/**
+ * "Currently exploring", shown below the skill cards: what is being learned
+ * right now. Technologies can appear here and in the skills above.
+ */
+export const exploring: ExploringTopic[] = [
+  {
+    icon: 'typescript',
+    title: { de: 'TypeScript', en: 'TypeScript' },
+    status: { de: 'Vertiefen', en: 'Learning' },
+    description: {
+      de: 'Ich vertiefe meine Kenntnisse in Typen, Funktionen und der Strukturierung von Code.',
+      en: 'Getting more comfortable with types, functions, and writing structured, maintainable code.',
+    },
+  },
+  {
+    icon: 'sparkles',
+    title: { de: 'KI / Machine Learning', en: 'AI / Machine Learning' },
+    status: { de: 'Entdecken', en: 'Exploring' },
+    description: {
+      de: 'Ich beschäftige mich damit, wie künstliche Intelligenz und maschinelles Lernen funktionieren und wie man sie praktisch einsetzen kann.',
+      en: 'Learning how AI and machine learning work, and exploring ways to use them in practical applications.',
+    },
+  },
+  {
+    icon: 'database',
+    title: { de: 'SQL & Datenbankdesign', en: 'SQL & Database Design' },
+    status: { de: 'Üben', en: 'Practicing' },
+    description: {
+      de: 'Ich erweitere meine SQL-Kenntnisse und beschäftige mich mit dem Aufbau und der Modellierung relationaler Datenbanken.',
+      en: 'Improving my SQL skills and learning how to design, structure, and work with relational databases.',
+    },
+  },
+];
