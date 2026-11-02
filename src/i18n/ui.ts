@@ -108,11 +108,11 @@ const de = {
   },
   about: {
     label: 'Über mich',
-    title: 'Verstehen, wie es funktioniert',
-    lead: 'Ich mache meine Lehre als Informatikerin EFZ in der Fachrichtung Applikationsentwicklung – und programmiere auch dann weiter, wenn es niemand verlangt.',
+    lead: 'Ich mache aktuell eine Ausbildung als Informatikerin EFZ in der Applikationsentwicklung und beschäftige mich auch in meiner Freizeit gerne mit Informatik.',
     paragraphs: [
-      'Am Programmieren mag ich den Moment, in dem ein Problem plötzlich Sinn ergibt. Bis dahin heisst es: zerlegen, ausprobieren, nachlesen, nochmals versuchen. Genau dieser Weg interessiert mich.',
-      'Ich stehe am Anfang meines Berufswegs, und das ist in Ordnung. Dafür lerne ich gezielt: Jedes Projekt hier hat einen Grund – ein Thema, das ich verstehen will, oder ein Werkzeug, das mir selbst gefehlt hat.',
+      'Am Programmieren gefällt mir besonders, dass ich eigene Ideen umsetzen und ausprobieren kann. Ich finde es interessant, herauszufinden, wie etwas funktioniert, verschiedene Lösungswege zu testen und am Ende zu sehen, dass aus einer Idee tatsächlich etwas entstanden ist.',
+      'Dabei lege ich mich nicht unbedingt auf einen bestimmten Bereich fest. Ich habe mich bisher unter anderem mit Webentwicklung, eigenen Anwendungen und Spieleentwicklung beschäftigt und probiere gerne neue Technologien aus.',
+      'Auch ausserhalb der Informatik interessiere ich mich für ganz unterschiedliche Themen, besonders für Astronomie, Psychologie und Sprachen. Ausserdem spiele ich gerne Schach und höre Musik.',
     ],
     facts: [
       { term: 'Ausbildung', value: 'Informatikerin EFZ' },
@@ -292,11 +292,11 @@ const en: Dictionary = {
   },
   about: {
     label: 'About',
-    title: 'Understanding how it works',
-    lead: "I'm training as a software developer in Switzerland (Informatikerin EFZ, application development), and I keep programming when nobody is asking me to.",
+    lead: "I'm currently doing an apprenticeship in application development (Informatikerin EFZ), and computer science is something I also enjoy in my free time.",
     paragraphs: [
-      'What I like about programming is the moment a problem suddenly makes sense. Getting there means taking it apart, trying things, reading up, and trying again. That path is the part I enjoy.',
-      "I'm at the start of my career, and that's fine. I learn deliberately: every project here exists for a reason, either a topic I want to understand or a tool I was missing myself.",
+      "What I like most about programming is being able to turn my own ideas into something and try them out. I find it interesting to work out how something works, test different ways of solving a problem, and see at the end that an idea has actually become something real.",
+      "I don't necessarily stick to one particular area. So far I've worked on web development, my own applications and game development, among other things, and I like trying out new technologies.",
+      "Outside of computer science, I'm interested in all sorts of topics too, especially astronomy, psychology and languages. I also like playing chess and listening to music.",
     ],
     facts: [
       { term: 'Training', value: 'Informatikerin EFZ (Swiss federal diploma apprenticeship)' },

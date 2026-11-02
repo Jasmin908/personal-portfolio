@@ -12,8 +12,7 @@ const t = useTranslations(Astro.props.locale);
 <section class="section about" id="about" aria-labelledby="about-title">
   <div class="container layout">
     <div class="side" data-reveal>
-      <p class="label" data-index="02">{t.about.label}</p>
-      <h2 id="about-title">{t.about.title}</h2>
+      <h2 class="label" id="about-title" data-index="02">{t.about.label}</h2>
     </div>
 
     <div class="main">
@@ -70,12 +69,10 @@ const t = useTranslations(Astro.props.locale);
     align-self: start;
   }
 
-  h2 {
-    margin-top: 1.25rem;
-    font-size: clamp(1.5rem, 2.4vw, 2rem);
-    font-weight: 600;
-    line-height: 1.1;
-    color: var(--muted);
+  /* The section heading, styled like the labels of the other sections. */
+  .label {
+    font-weight: 400;
+    line-height: 1.6;
   }
 
   /* The statement is the visual centre of this section, not a heading. */
