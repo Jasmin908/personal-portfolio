@@ -24,8 +24,8 @@ import habitflowStatistics from '../assets/projects/habitflow-statistics.webp';
  * this file and set `image` / `screenshots`. Until then the generated
  * placeholder cover (`cover`) is shown.
  *
- * Links: leave `demoUrl` / `repoUrl` out until they exist. Missing links are
- * shown as "to follow" and are not clickable.
+ * Links: set `demoUrl` / `repoUrl` only when the demo or a public repository
+ * exists. A button is shown for each link that is set, and nothing otherwise.
  *
  * Order: featured projects first, in the order shown on the home page, then
  * the smaller ones under "More projects".
@@ -89,11 +89,7 @@ export interface Project {
   demoUrl?: string;
   /** Replaces the usual "Live demo" label and adds a prominent button on the detail page, e.g. "Play game". */
   demoLabel?: Localized<string>;
-  /** Set when there is nothing to try online, e.g. a console program, so no "to follow" note is shown. */
-  hideDemo?: boolean;
   repoUrl?: string;
-  /** Set when no public repository is planned for now, so no "to follow" note is shown. */
-  hideRepo?: boolean;
   title: Localized<string>;
   tagline: Localized<string>;
   summary: Localized<string>;
@@ -458,7 +454,6 @@ export const projects: Project[] = [
     stack: ['Godot 4.5', 'GDScript', '2D Game Development', 'Pixel Art'],
     demoUrl: 'https://gamedevproject12312.itch.io/everbound',
     demoLabel: { de: 'Auf itch.io spielen', en: 'Play on itch.io' },
-    hideRepo: true,
     pixelArt: true,
     title: { de: 'Everbound', en: 'Everbound' },
     tagline: { de: '2D-Pixel-Art-Plattformer', en: '2D Pixel Art Platformer' },
@@ -593,8 +588,6 @@ export const projects: Project[] = [
     cover: 'terminal',
     accent: 'blue',
     stack: ['C#', '.NET', 'LINQ', 'CSV', 'HttpClient', 'Async/Await'],
-    hideDemo: true,
-    hideRepo: true,
     title: { de: 'Image Downloader & Article Synchronizer', en: 'Image Downloader & Article Synchronizer' },
     tagline: { de: 'Artikelabgleich & Bilddownload', en: 'Article Sync & Image Download' },
     summary: {
@@ -636,7 +629,7 @@ export const projects: Project[] = [
         challenges:
           'Die Artikelnummern in der Liste beginnen mit einem «W», der Bilddienst erwartet sie aber ohne. Das Programm entfernt das Zeichen deshalb nur für die Anfrage und behält die ursprüngliche Nummer als Dateiname. Ausserdem darf eine leere aktuelle Liste die gespeicherte Vergleichsbasis nicht überschreiben; das wird vor dem Speichern geprüft.',
         limitations:
-          'Die Bilder werden nacheinander geladen, ohne erneuten Versuch bei einem Fehler, und immer als .jpg gespeichert. Dateinamen sind im Code festgelegt. Die Adresse und der Zugangsschlüssel des Bilddienstes stehen im Code; vor einer Veröffentlichung des Quellcodes gehören sie in eine Umgebungsvariable. Der Quellcode ist darum nicht öffentlich.',
+          'Die Bilder werden nacheinander geladen, ohne erneuten Versuch bei einem Fehler, und immer als .jpg gespeichert. Dateinamen sind im Code festgelegt. Das Programm ist auf einen externen Bilddienst angewiesen: Liefert dieser für einen Artikel kein Bild, wird ein Fehler gemeldet und der nächste Artikel bearbeitet.',
       },
       en: {
         overview:
@@ -650,7 +643,7 @@ export const projects: Project[] = [
         challenges:
           'The article numbers in the list start with a "W", but the image service expects them without it. The program therefore removes the letter for the request only and keeps the original number as the file name. Also, an empty current list must not overwrite the stored basis for comparison, so this is checked before saving.',
         limitations:
-          'Images are downloaded one after another, with no retry after an error, and are always saved as .jpg. File names are fixed in the code. The address and the access key of the image service are in the code; before the source code is published they belong in an environment variable. That is why the source code is not public.',
+          'Images are downloaded one after another, with no retry after an error, and are always saved as .jpg. File names are fixed in the code. The program depends on an external image service: if the service returns no image for an article, an error is reported and the program moves on to the next one.',
       },
     },
   },
@@ -661,8 +654,6 @@ export const projects: Project[] = [
     cover: 'terminal',
     accent: 'violet',
     stack: ['C#', '.NET', 'JSON', 'File I/O'],
-    hideDemo: true,
-    hideRepo: true,
     title: { de: 'Markdown Week Planner Generator', en: 'Markdown Week Planner Generator' },
     tagline: { de: 'Planungsdateien auf Knopfdruck', en: 'Planning Files on Demand' },
     summary: {
@@ -727,8 +718,6 @@ export const projects: Project[] = [
     cover: 'terminal',
     accent: 'lime',
     stack: ['Python'],
-    hideDemo: true,
-    hideRepo: true,
     title: { de: 'Python Task Manager', en: 'Python Task Manager' },
     tagline: { de: 'Aufgabenliste im Terminal', en: 'A To-Do List in the Terminal' },
     summary: {

@@ -126,10 +126,16 @@ const next = projects[(projects.indexOf(project) + 1) % projects.length];
             <dt>{project.status === 'planned' ? t.projects.stackPlanned : t.projects.stack}</dt>
             <dd>{project.stack.join(' · ') || t.projects.stackOpen}</dd>
           </div>
-          <div>
-            <dt>{t.project.links}</dt>
-            <dd><ProjectLinks project={project} locale={locale} explainEmpty /></dd>
-          </div>
+          {
+            (project.demoUrl || project.repoUrl) && (
+              <div>
+                <dt>{t.project.links}</dt>
+                <dd>
+                  <ProjectLinks project={project} locale={locale} />
+                </dd>
+              </div>
+            )
+          }
         </dl>
       </div>
     </header>
