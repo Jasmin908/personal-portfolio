@@ -5,7 +5,8 @@ import '../styles/global.css';
 import { homePath, localeCodes, locales } from '../i18n/config';
 import { useTranslations } from '../i18n/ui';
 
-// Netlify serves this single file for every unknown URL, so it speaks all languages.
+// The host (Cloudflare Pages) serves this single file for every unknown URL,
+// so it speaks all languages. Only the first language gets the h1.
 ---
 
 <!doctype html>
@@ -21,11 +22,12 @@ import { useTranslations } from '../i18n/ui';
     <main>
       <p class="code" aria-hidden="true">404</p>
       {
-        localeCodes.map((code) => {
+        localeCodes.map((code, index) => {
           const t = useTranslations(code);
+          const Heading = index === 0 ? 'h1' : 'h2';
           return (
             <section lang={locales[code].htmlLang}>
-              <h1>{t.notFound.title}</h1>
+              <Heading class="title">{t.notFound.title}</Heading>
               <p>{t.notFound.text}</p>
               <a class="btn btn--ghost" href={homePath(code)}>
                 {t.notFound.cta}
@@ -66,7 +68,7 @@ import { useTranslations } from '../i18n/ui';
     border-top: 1px solid var(--line);
   }
 
-  h1 {
+  .title {
     font-size: 1.75rem;
   }
 

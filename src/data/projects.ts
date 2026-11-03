@@ -471,13 +471,13 @@ export const projects: Project[] = [
         { value: 'Godot 4.5', label: 'Engine, programmiert in GDScript' },
         { value: 'Web', label: 'im Browser spielbar, ohne Installation' },
         { value: 'Tastatur & Touch', label: 'Steuerung am Computer und auf dem Smartphone' },
-        { value: '≈ 43 MB', label: 'Download beim ersten Aufruf' },
+        { value: '≈ 45 MB', label: 'Download beim ersten Aufruf' },
       ],
       en: [
         { value: 'Godot 4.5', label: 'engine, programmed in GDScript' },
         { value: 'Web', label: 'playable in the browser, with nothing to install' },
         { value: 'Keyboard & touch', label: 'controls on a computer and on a phone' },
-        { value: '≈ 43 MB', label: 'download on the first visit' },
+        { value: '≈ 45 MB', label: 'download on the first visit' },
       ],
     },
     featureGroups: {
@@ -563,7 +563,7 @@ export const projects: Project[] = [
         challenges:
           'Die Browser-Version brauchte eigene Anpassungen. Ein «Quit»-Button ergibt in einem Browser-Tab keinen Sinn und liess das Spiel dort einfrieren; er wird in der Web-Version ausgeblendet. Ein Signal war doppelt verbunden, einmal im Editor und einmal im Skript, was beim Laden eines Levels Fehlermeldungen auslöste. Und die Touch-Buttons sollten auf dem Smartphone sichtbar sein, bei Tastaturbedienung aber nicht stören: Sie erscheinen nun auf Touch-Geräten und beim ersten Berühren des Bildschirms und verschwinden, sobald eine Taste gedrückt wird.',
         limitations:
-          'Everbound ist ein Prototyp. In der Browser-Version wurde der Anfang des ersten Levels getestet; weitere Bereiche sind im Projekt angelegt, aber nicht vollständig geprüft, und ein drittes Level ist erst als leere Szene vorhanden. Das Spiel speichert keinen Fortschritt. Der erste Aufruf lädt rund 43 MB. Getestet wurde in einem Chromium-Browser; auf echten Smartphones und in anderen Browsern steht ein Test noch aus.',
+          'Everbound ist ein Prototyp. In der Browser-Version wurde der Anfang des ersten Levels getestet; weitere Bereiche sind im Projekt angelegt, aber nicht vollständig geprüft, und ein drittes Level ist erst als leere Szene vorhanden. Das Spiel speichert keinen Fortschritt. Der erste Aufruf lädt rund 45 MB. Getestet wurde in einem Chromium-Browser; auf echten Smartphones und in anderen Browsern steht ein Test noch aus.',
         learnings:
           'Das Projekt zeigt, dass ein Spiel aus vielen kleinen Systemen besteht, die erst im Zusammenspiel Spass machen, und dass eigene Szenen pro Element diese Systeme überschaubar halten. Es zeigt auch, dass eine Veröffentlichung im Browser ein eigener Arbeitsschritt ist: Was auf dem Desktop funktioniert, muss dort noch einmal geprüft werden.',
       },
@@ -579,7 +579,7 @@ export const projects: Project[] = [
         challenges:
           'The browser version needed adjustments of its own. A "Quit" button makes no sense in a browser tab and froze the game there, so it is hidden in the web build. One signal was connected twice, once in the editor and once in a script, which caused error messages whenever a level loaded. And the touch buttons had to be visible on a phone without getting in the way of keyboard play: they now appear on touch devices and on the first touch of the screen, and disappear as soon as a key is pressed.',
         limitations:
-          'Everbound is a prototype. In the browser version, the beginning of the first level has been tested; further areas exist in the project but have not been fully checked, and a third level is only an empty scene so far. The game does not save progress. The first visit downloads about 43 MB. Testing was done in a Chromium browser; real phones and other browsers have not been tested yet.',
+          'Everbound is a prototype. In the browser version, the beginning of the first level has been tested; further areas exist in the project but have not been fully checked, and a third level is only an empty scene so far. The game does not save progress. The first visit downloads about 45 MB. Testing was done in a Chromium browser; real phones and other browsers have not been tested yet.',
         learnings:
           'The project shows that a game consists of many small systems that only become fun together, and that giving each element its own scene keeps those systems manageable. It also shows that publishing in the browser is a step of its own: what works on the desktop has to be checked again there.',
       },

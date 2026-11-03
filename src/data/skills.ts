@@ -34,7 +34,7 @@ export const skillGroups: SkillGroup[] = [
     id: 'languages',
     icon: 'code',
     label: { de: 'Programmiersprachen', en: 'Programming languages' },
-    items: ['Python', 'Java', 'C#'],
+    items: ['Python', 'Java', 'C#', 'TypeScript'],
   },
   {
     id: 'web',
@@ -63,11 +63,11 @@ export const tools: ToolGroup = {
   subgroups: [
     {
       label: { de: 'Entwicklungsumgebungen', en: 'Development environments' },
-      items: ['Visual Studio Code', 'PyCharm', 'IntelliJ IDEA', 'Apache NetBeans'],
+      items: ['Visual Studio Code', 'PyCharm', 'IntelliJ IDEA', 'Apache NetBeans', 'SQL Server Management Studio (SSMS)'],
     },
     {
       label: { de: 'Versionsverwaltung & Deployment', en: 'Version control & deployment' },
-      items: ['Git', 'GitHub', 'GitLab', 'Netlify'],
+      items: ['Git', 'GitHub', 'GitLab', 'Netlify', 'Cloudflare Pages'],
     },
     {
       // Godot is a tool too, but already listed under Game Development.
