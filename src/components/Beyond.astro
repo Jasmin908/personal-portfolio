@@ -1,5 +1,7 @@
 ---
 import SkillIcon from './SkillIcon.astro';
+import Arrow from './Arrow.astro';
+import { site } from '../data/site';
 import type { Locale } from '../i18n/config';
 import { useTranslations } from '../i18n/ui';
 
@@ -40,6 +42,16 @@ const cards = [
         ))
       }
     </ul>
+
+    <!-- Link to the separate research and knowledge website. -->
+    <a class="research" href={site.research} data-spot data-reveal>
+      <SkillIcon name="book" />
+      <div class="research-text">
+        <h3>{t.beyond.research.title}</h3>
+        <p>{t.beyond.research.text}</p>
+      </div>
+      <span class="research-cta">{t.beyond.research.cta}<Arrow /></span>
+    </a>
   </div>
 </section>
 
@@ -129,6 +141,105 @@ const cards = [
     font-size: 1rem;
     line-height: 1.55;
     color: var(--muted);
+  }
+
+  /* ---------- Research website: one wide card under the grid ---------- */
+  .research {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: clamp(1rem, 2.5vw, 2rem);
+    margin-top: clamp(0.75rem, 1.5vw, 1.25rem);
+    padding: clamp(1.5rem, 2.2vw, 2rem);
+    border-radius: var(--r-m);
+    border: 1px solid var(--line);
+    background:
+      radial-gradient(80% 160% at 100% 0%, rgb(139 92 246 / 0.16), transparent 60%),
+      rgb(27 26 42 / 0.55);
+    overflow: hidden;
+    transition:
+      border-color 0.5s var(--ease),
+      opacity 0.9s var(--ease) var(--d, 0ms),
+      transform 0.9s var(--ease) var(--d, 0ms);
+  }
+
+  .research::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(24rem circle at var(--mx, 50%) var(--my, 0%), rgb(139 92 246 / 0.14), transparent 60%);
+    opacity: 0;
+    transition: opacity 0.5s var(--ease);
+    pointer-events: none;
+  }
+
+  .research:hover {
+    border-color: rgb(196 181 253 / 0.4);
+  }
+
+  .research:hover::before {
+    opacity: 1;
+  }
+
+  .research:hover :global(.icon) {
+    background: rgb(139 92 246 / 0.24);
+    border-color: var(--violet-soft);
+    color: var(--text);
+  }
+
+  .research-text {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .research h3 {
+    margin-top: 0;
+    padding-top: 0;
+  }
+
+  .research p {
+    margin-top: 0.5rem;
+    max-width: 44rem;
+    font-size: 1rem;
+    line-height: 1.55;
+    color: var(--muted);
+  }
+
+  .research-cta {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 560;
+    white-space: nowrap;
+  }
+
+  .research-cta :global(svg) {
+    width: 1rem;
+    height: 1rem;
+    transition: transform 0.4s var(--ease);
+  }
+
+  .research:hover .research-cta :global(svg) {
+    transform: translateX(5px);
+  }
+
+  .research:focus-visible {
+    outline: 2px solid var(--lime);
+    outline-offset: 3px;
+  }
+
+  @media (max-width: 760px) {
+    .research {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .research:hover .research-cta :global(svg) {
+      transform: none;
+    }
   }
 
   @media (max-width: 1000px) {

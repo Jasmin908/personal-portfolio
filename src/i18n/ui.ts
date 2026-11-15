@@ -23,6 +23,7 @@ const de = {
     menuClose: 'Menü schliessen',
     skip: 'Zum Inhalt springen',
     language: 'Sprache',
+    research: 'Wissen & Recherche',
   },
   hero: {
     eyebrow: 'Lernende Informatikerin EFZ · Applikationsentwicklung',
@@ -171,6 +172,11 @@ const de = {
         text: 'Ich setze mir gerne neue Ziele, lerne neue Fähigkeiten und möchte mich sowohl persönlich als auch fachlich weiterentwickeln.',
       },
     },
+    research: {
+      title: 'Wissen & Recherche',
+      text: 'Neben dem Programmieren beschäftige ich mich gerne mit Themen wie Astronomie, Psychologie, Sprachen und vielem mehr. Auf meiner Wissenswebsite sammle ich meine Notizen, Zusammenfassungen und das, was ich dabei lerne.',
+      cta: 'Meine Beiträge entdecken',
+    },
   },
   contact: {
     label: 'Kontakt',
@@ -211,6 +217,7 @@ const en: Dictionary = {
     menuClose: 'Close menu',
     skip: 'Skip to content',
     language: 'Language',
+    research: 'Research',
   },
   hero: {
     eyebrow: 'Software development apprentice · Switzerland',
@@ -355,6 +362,11 @@ const en: Dictionary = {
         title: 'Personal Growth',
         text: 'I enjoy setting new goals, learning new skills, and developing both personally and professionally.',
       },
+    },
+    research: {
+      title: 'Research & Learning',
+      text: "Beyond programming, I enjoy exploring subjects like astronomy, psychology, languages, and more. My research website is where I collect my notes, summaries, and things I've learned along the way.",
+      cta: 'Explore my research',
     },
   },
   contact: {

@@ -44,6 +44,9 @@ const items = [
           </li>
         ))
       }
+      <li>
+        <a class="external" href={site.research}>{t.nav.research}<span aria-hidden="true">↗</span></a>
+      </li>
     </ul>
 
     <div class="end">
@@ -75,6 +78,12 @@ const items = [
           </li>
         ))
       }
+      <li>
+        <a href={site.research}>
+          <span class="num">↗</span>
+          {t.nav.research}
+        </a>
+      </li>
     </ul>
   </div>
 </header>
@@ -85,8 +94,15 @@ const items = [
     top: 1rem;
     left: 50%;
     z-index: 50;
-    width: min(100% - 2rem, 46rem);
+    width: min(100% - 2rem, 54rem);
     transform: translateX(-50%);
+  }
+
+  /* Link to the separate research website. */
+  .external span {
+    margin-left: 0.2rem;
+    font-size: 0.8em;
+    color: var(--violet-soft);
   }
 
   .bar {
