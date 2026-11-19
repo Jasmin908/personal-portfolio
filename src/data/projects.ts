@@ -630,6 +630,8 @@ export const projects: Project[] = [
           'Die Artikelnummern in der Liste beginnen mit einem «W», der Bilddienst erwartet sie aber ohne. Das Programm entfernt das Zeichen deshalb nur für die Anfrage und behält die ursprüngliche Nummer als Dateiname. Ausserdem darf eine leere aktuelle Liste die gespeicherte Vergleichsbasis nicht überschreiben; das wird vor dem Speichern geprüft.',
         limitations:
           'Die Bilder werden nacheinander geladen, ohne erneuten Versuch bei einem Fehler, und immer als .jpg gespeichert. Dateinamen sind im Code festgelegt. Das Programm ist auf einen externen Bilddienst angewiesen: Liefert dieser für einen Artikel kein Bild, wird ein Fehler gemeldet und der nächste Artikel bearbeitet.',
+        learnings:
+          'Das Projekt zeigt, wie viel Handarbeit ein kleines Programm sparen kann, wenn man die Aufgabe in klare Schritte zerlegt: Listen einlesen, vergleichen, Ergebnisse speichern, Bilder laden und die Vergleichsbasis für den nächsten Lauf ablegen. Technisch kommen dabei Dateizugriffe, LINQ für das Bereinigen und Vergleichen der Listen und asynchrone HTTP-Anfragen mit HttpClient zusammen. Verbessern würde ich vor allem die Fehlerbehandlung: Ein Statuscode ohne Erfolg wird zwar gemeldet, aber wenn die Verbindung ganz ausfällt, gibt es kein try/catch, und das Programm bricht ab. Ausserdem gehören die Adresse des Bilddienstes, sein Schlüssel und die Dateinamen in eine Konfigurationsdatei statt in den Code. Das Dateiformat könnte aus der Antwort des Servers bestimmt werden, statt immer .jpg zu verwenden, und bei vielen neuen Artikeln würden mehrere Downloads gleichzeitig Zeit sparen.',
       },
       en: {
         overview:
@@ -644,6 +646,8 @@ export const projects: Project[] = [
           'The article numbers in the list start with a "W", but the image service expects them without it. The program therefore removes the letter for the request only and keeps the original number as the file name. Also, an empty current list must not overwrite the stored basis for comparison, so this is checked before saving.',
         limitations:
           'Images are downloaded one after another, with no retry after an error, and are always saved as .jpg. File names are fixed in the code. The program depends on an external image service: if the service returns no image for an article, an error is reported and the program moves on to the next one.',
+        learnings:
+          "The project shows how much manual work a small program can save when the task is broken down into clear steps: read the lists, compare them, save the results, download the images and store the basis for the next run. Technically, it brings together file access, LINQ for cleaning and comparing the lists, and asynchronous HTTP requests with HttpClient. The main thing I would improve is the error handling: an unsuccessful status code is reported, but if the connection fails completely there is no try/catch, and the program stops. The address of the image service, its key and the file names also belong in a configuration file rather than in the code. The file format could be taken from the server's response instead of always using .jpg, and with many new articles, running several downloads at the same time would save time.",
       },
     },
   },
@@ -694,6 +698,8 @@ export const projects: Project[] = [
           'Knifflig war die Wochenlogik: Das Programm sucht den ersten Montag des Monats, geht von dort Woche für Woche weiter und hört am Monatsende mitten in der Woche auf. Die Kalenderwoche richtet sich nach ISO 8601, damit die Nummern zu üblichen Kalendern passen, auch an Jahreswechseln.',
         limitations:
           'Arbeitstage vor dem ersten Montag eines Monats erhalten keine Datei. Eingaben werden nicht geprüft, ein falsches Format beendet das Programm mit einem Fehler. Die Pfade sind für Windows geschrieben.',
+        learnings:
+          'Das Projekt zeigt, dass beim Arbeiten mit Daten die Details zählen: Wann beginnt eine Woche, zu welcher Kalenderwoche gehört ein Tag, und was passiert am Jahreswechsel? Dafür nutzt das Programm DateTime und ISOWeek, statt selbst zu rechnen. Dazu kommen das Anlegen von Ordnern und Dateien, eine JSON-Konfiguration und eine Vorlage mit Platzhaltern. Weil bestehende Dateien nie überschrieben werden, kann man das Programm gefahrlos mehrmals laufen lassen. Verbessern würde ich die Eingaben: Mit TryParseExact und int.TryParse könnte das Programm bei einem falschen Format nachfragen, statt abzubrechen. Die Tage vor dem ersten Montag eines Monats sollten auch eine Datei bekommen, und Path.Combine statt fest eingebauter Backslashes würde die Pfade auf anderen Systemen lauffähig machen. Ausserdem steht die Zusammenfassung am Schluss noch in der Monatsschleife und wird deshalb nach jedem Monat ausgegeben.',
       },
       en: {
         overview:
@@ -708,6 +714,8 @@ export const projects: Project[] = [
           'The week logic was the tricky part: the program looks for the first Monday of the month, moves on week by week from there and stops at the end of the month, even mid-week. Calendar weeks follow ISO 8601 so the numbers match common calendars, including around the turn of the year.',
         limitations:
           'Working days before the first Monday of a month get no file. Input is not validated, so a wrong format ends the program with an error. The paths are written for Windows.',
+        learnings:
+          "The project shows that the details matter when working with dates: when does a week start, which calendar week does a day belong to, and what happens at the turn of the year? For this, the program uses DateTime and ISOWeek instead of doing the maths itself. It also involves creating folders and files, a JSON configuration and a template with placeholders. Because existing files are never overwritten, the program can safely be run more than once. The main thing I would improve is the input: with TryParseExact and int.TryParse, the program could ask again after a wrong format instead of stopping. The days before the first Monday of a month should get a file too, and Path.Combine instead of hard-coded backslashes would make the paths work on other systems. Also, the summary at the end is still inside the month loop, so it is printed after every month.",
       },
     },
   },
@@ -754,6 +762,8 @@ export const projects: Project[] = [
           'Die Liste zählt ab 0, Menschen zählen ab 1: Die eingegebene Nummer wird deshalb vor dem Entfernen um eins verringert. Eingaben, die keine gültige Nummer sind, fängt ein try/except ab, statt das Programm abstürzen zu lassen.',
         limitations:
           'Die Aufgaben existieren nur, solange das Programm läuft, und werden nicht gespeichert. Eine ungültige Menüauswahl zeigt einfach das Menü erneut, ohne Hinweis. Das try/except fängt alle Fehler ab statt nur die erwarteten.',
+        learnings:
+          'Das Projekt zeigt, dass schon wenige Grundbausteine für ein Programm reichen, das man wirklich benutzen kann: Eine Schleife hält das Menü am Laufen, eine Liste speichert die Aufgaben, und eine eigene Funktion für die Anzeige wird an zwei Stellen gebraucht statt doppelt geschrieben. Dazu kommen Benutzereingaben, die Umwandlung von Text in eine Zahl, Fehlerbehandlung mit try/except und der Unterschied zwischen der Zählweise der Liste und der von Menschen. Als Nächstes würde ich die Aufgaben in einer Datei speichern, zum Beispiel als JSON, damit sie beim nächsten Start noch da sind. Das try/except sollte nur die erwarteten Fehler abfangen, also ValueError und IndexError, und eine ungültige Menüauswahl sollte einen Hinweis zeigen. Sinnvoll wäre auch, Aufgaben als erledigt markieren zu können, statt sie nur zu löschen, und die Logik von den Ein- und Ausgaben zu trennen, damit sie sich mit Tests prüfen lässt.',
       },
       en: {
         overview:
@@ -768,6 +778,8 @@ export const projects: Project[] = [
           'The list counts from 0, people count from 1, so the number entered is reduced by one before removing. Input that is not a valid number is caught by a try/except instead of crashing the program.',
         limitations:
           'Tasks only exist while the program is running and are not saved. An invalid menu choice simply shows the menu again, without a message. The try/except catches every error rather than only the expected ones.',
+        learnings:
+          "The project shows that a few basic building blocks are enough for a program you can actually use: a loop keeps the menu running, a list stores the tasks, and a separate function for showing them is used in two places instead of being written twice. On top of that come user input, converting text into a number, error handling with try/except, and the difference between how the list counts and how people count. Next, I would save the tasks to a file, for example as JSON, so they are still there the next time the program starts. The try/except should only catch the expected errors, ValueError and IndexError, and an invalid menu choice should show a message. It would also make sense to be able to mark tasks as done instead of only deleting them, and to separate the logic from the input and output so that it can be checked with tests.",
       },
     },
   },
