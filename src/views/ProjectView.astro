@@ -1,5 +1,6 @@
 ---
 import { Image, getImage } from 'astro:assets';
+import { Code } from 'astro:components';
 import Base from '../layouts/Base.astro';
 import ProjectCover from '../components/ProjectCover.astro';
 import ProjectLinks from '../components/ProjectLinks.astro';
@@ -28,6 +29,16 @@ const featureGroups = project.featureGroups?.[locale] ?? [];
 const facts = project.facts?.[locale] ?? [];
 const screenshots = project.screenshots ?? [];
 
+// Copies of the original source lines, kept unchanged in src/code/.
+const codeFiles = import.meta.glob<string>('../code/**/*', { query: '?raw', import: 'default', eager: true });
+// Planned projects have no code to show.
+const sourceCode = project.status === 'planned' ? undefined : project.sourceCode;
+const excerpts = (sourceCode?.excerpts ?? []).map((excerpt) => {
+  const code = codeFiles[`../code/${excerpt.source}`];
+  if (code === undefined) throw new Error(`Missing source file src/code/${excerpt.source}`);
+  return { ...excerpt, code };
+});
+
 // Large versions for the lightbox. Pixel art keeps its original file, so it stays sharp.
 const gallery = await Promise.all(
   screenshots.map(async (shot) => ({
@@ -44,6 +55,7 @@ interface Chapter {
   list?: string[];
   groups?: FeatureGroup[];
   gallery?: boolean;
+  code?: boolean;
   pending?: boolean;
   empty?: boolean;
   /** Content runs across the full width instead of the right-hand column. */
@@ -75,6 +87,8 @@ const chapters: Chapter[] = [
     pending: !study.learnings,
   },
   ...(gallery.length === 0 ? [{ title: t.project.screenshots, text: screenshotsPending, pending: true, empty: true }] : []),
+  // Last, so the numbers of the chapters above stay the same.
+  ...(excerpts.length > 0 ? [{ title: t.project.sourceCode, code: true, wide: true }] : []),
 ];
 
 const next = projects[(projects.indexOf(project) + 1) % projects.length];
@@ -191,6 +205,52 @@ const next = projects[(projects.indexOf(project) + 1) % projects.length];
                     <li>{item}</li>
                   ))}
                 </ul>
+              ) : chapter.code ? (
+                <div class="code">
+                  {sourceCode?.note && <p class="code-note">{sourceCode.note[locale]}</p>}
+                  {excerpts.map((excerpt) => (
+                    <figure class="code-file">
+                      <div class="code-head">
+                        <span class="code-dots" aria-hidden="true">
+                          <i />
+                          <i />
+                          <i />
+                        </span>
+                        <span class="code-name">{excerpt.file}</span>
+                        <span class="code-range">
+                          {excerpt.lines
+                            ? t.project.codeExcerpt
+                                .replace('{from}', String(excerpt.lines[0]))
+                                .replace('{to}', String(excerpt.lines[1]))
+                            : t.project.codeComplete}
+                        </span>
+                        {/* Shown by the script below; without JavaScript the code can still be selected. */}
+                        <button
+                          type="button"
+                          class="code-copy"
+                          aria-label={t.project.codeCopyLabel.replace('{file}', excerpt.file)}
+                          data-copy
+                          data-copied={t.project.codeCopied}
+                          hidden
+                        >
+                          {t.project.codeCopy}
+                        </button>
+                      </div>
+                      {/* Line numbers continue from the original file, so an excerpt shows where it comes from. */}
+                      <div class="code-body" style={`counter-reset: line ${(excerpt.lines?.[0] ?? 1) - 1}`}>
+                        <Code code={excerpt.code} lang={excerpt.lang} theme="tokyo-night" />
+                      </div>
+                      <figcaption>{excerpt.caption[locale]}</figcaption>
+                    </figure>
+                  ))}
+                  {project.repoUrl && (
+                    <a class="code-repo" href={project.repoUrl} target="_blank" rel="noopener noreferrer">
+                      {t.project.codeRepo} <span aria-hidden="true">↗</span>
+                      <span class="visually-hidden">{t.project.newTab}</span>
+                    </a>
+                  )}
+                  <p class="visually-hidden" aria-live="polite" data-copy-status />
+                </div>
               ) : chapter.gallery ? (
                 // Each picture links to its large version, so the gallery works without
                 // JavaScript; with it, the link opens the lightbox below instead.
@@ -280,6 +340,49 @@ const next = projects[(projects.indexOf(project) + 1) % projects.length];
 </Base>
 
 <script>
+  // Copy buttons of the source code chapter.
+  const copyButtons = [...document.querySelectorAll<HTMLButtonElement>('[data-copy]')];
+  const copyStatus = document.querySelector<HTMLElement>('[data-copy-status]');
+
+  const copyText = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      // Older browsers, or the clipboard API is not allowed: copy through a hidden text field.
+      const field = document.createElement('textarea');
+      field.value = text;
+      field.setAttribute('readonly', '');
+      field.style.position = 'fixed';
+      field.style.opacity = '0';
+      document.body.append(field);
+      field.select();
+      const done = document.execCommand('copy');
+      field.remove();
+      return done;
+    }
+  };
+
+  copyButtons.forEach((button) => {
+    const label = button.textContent?.trim() ?? '';
+    const code = button.closest('.code-file')?.querySelector('pre');
+    if (!code) return;
+    button.hidden = false;
+    let timer: number | undefined;
+    button.addEventListener('click', async () => {
+      if (!(await copyText(code.textContent ?? ''))) return;
+      button.textContent = button.dataset.copied ?? label;
+      button.classList.add('is-done');
+      if (copyStatus) copyStatus.textContent = button.dataset.copied ?? '';
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => {
+        button.textContent = label;
+        button.classList.remove('is-done');
+        if (copyStatus) copyStatus.textContent = '';
+      }, 2000);
+    });
+  });
+
   // Lightbox for the screenshot gallery. Without JavaScript the links open the images directly.
   const dialog = document.querySelector<HTMLDialogElement>('[data-lightbox]');
   const items = [...document.querySelectorAll<HTMLAnchorElement>('[data-gallery-item]')];
@@ -734,6 +837,186 @@ const next = projects[(projects.indexOf(project) + 1) % projects.length];
     color: var(--muted);
     font-size: 0.9375rem;
     line-height: 1.45;
+  }
+
+  /* ---------- Source code ---------- */
+  .code {
+    display: grid;
+    gap: clamp(1.5rem, 3vw, 2.25rem);
+    min-width: 0;
+  }
+
+  .code-note {
+    max-width: 42rem;
+    padding: 1rem 1.25rem;
+    border-radius: var(--r-s);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--lime);
+    background: rgb(27 26 42 / 0.55);
+    font-size: 1rem;
+    line-height: 1.55;
+    color: var(--muted);
+  }
+
+  .code-file {
+    min-width: 0;
+  }
+
+  .code-head {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.65rem 0.75rem 0.65rem 1rem;
+    border: 1px solid var(--line);
+    border-bottom: 0;
+    border-radius: var(--r-m) var(--r-m) 0 0;
+    background: var(--surface-2);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+  }
+
+  .code-dots {
+    display: flex;
+    flex: none;
+    gap: 0.4rem;
+  }
+
+  .code-dots i {
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 50%;
+    background: var(--line-strong);
+  }
+
+  .code-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--text);
+  }
+
+  .code-range {
+    flex: none;
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    color: var(--violet-soft);
+  }
+
+  .code-copy {
+    flex: none;
+    margin-left: auto;
+    min-height: 2.25rem;
+    padding: 0.35rem 0.9rem;
+    border-radius: var(--pill);
+    border: 1px solid var(--line-strong);
+    background: rgb(255 255 255 / 0.04);
+    color: var(--text);
+    font: inherit;
+    cursor: pointer;
+    transition: border-color 0.3s var(--ease), color 0.3s var(--ease);
+  }
+
+  .code-copy[hidden] {
+    display: none;
+  }
+
+  .code-copy:hover {
+    border-color: var(--violet-soft);
+  }
+
+  .code-copy:focus-visible {
+    outline: 2px solid var(--lime);
+    outline-offset: 2px;
+  }
+
+  .code-copy.is-done {
+    border-color: var(--lime);
+    color: var(--lime);
+  }
+
+  .code-body {
+    border: 1px solid var(--line);
+    border-radius: 0 0 var(--r-m) var(--r-m);
+    background: #13121f;
+    overflow: hidden;
+  }
+
+  /* Long lines scroll sideways inside the block instead of widening the page. */
+  .code-body :global(pre) {
+    margin: 0;
+    padding: 1.1rem 1.25rem 1.1rem 0;
+    overflow-x: auto;
+    background-color: transparent !important;
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    line-height: 1.65;
+    tab-size: 4;
+  }
+
+  .code-body :global(pre:focus-visible) {
+    outline: 2px solid var(--lime);
+    outline-offset: -2px;
+  }
+
+  .code-body :global(code) {
+    display: block;
+    width: max-content;
+    min-width: 100%;
+  }
+
+  .code-body :global(.line) {
+    counter-increment: line;
+  }
+
+  /* Line numbers are drawn by CSS, so they are not selected or copied with the code. */
+  .code-body :global(.line)::before {
+    content: counter(line);
+    display: inline-block;
+    width: 3.25rem;
+    padding-right: 1.25rem;
+    text-align: right;
+    color: rgb(170 168 192 / 0.45);
+    user-select: none;
+  }
+
+  .code-file figcaption {
+    max-width: 42rem;
+    margin-top: 0.75rem;
+    color: var(--muted);
+    font-size: 0.9375rem;
+    line-height: 1.45;
+  }
+
+  .code-repo {
+    justify-self: start;
+    display: inline-flex;
+    gap: 0.5rem;
+    font-weight: 500;
+    color: var(--violet-soft);
+    text-decoration: underline;
+    text-decoration-color: rgb(196 181 253 / 0.4);
+    text-underline-offset: 0.25em;
+    transition: text-decoration-color 0.3s var(--ease);
+  }
+
+  .code-repo:hover {
+    text-decoration-color: currentColor;
+  }
+
+  @media (max-width: 640px) {
+    .code-range {
+      display: none;
+    }
+
+    .code-body :global(pre) {
+      font-size: 0.8125rem;
+    }
+
+    .code-body :global(.line)::before {
+      width: 2.5rem;
+      padding-right: 0.9rem;
+    }
   }
 
   /* ---------- Lightbox ---------- */

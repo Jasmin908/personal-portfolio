@@ -66,6 +66,29 @@ export interface Screenshot {
   alt: Localized<string>;
 }
 
+/**
+ * A piece of real source code shown under "Source code".
+ * The file in src/code/ is an unchanged copy of the original lines; never edit
+ * it by hand or tidy it up, so the page always shows the actual code.
+ */
+export interface CodeExcerpt {
+  /** Path of the copy inside src/code/, e.g. 'habitflow/stats.js'. */
+  source: string;
+  /** Name shown in the header: the original file name or path in the project. */
+  file: string;
+  lang: 'js' | 'ts' | 'python' | 'csharp' | 'gdscript';
+  /** Line numbers in the original file. Leave out when the whole file is shown. */
+  lines?: [number, number];
+  /** One sentence on what the code does. */
+  caption: Localized<string>;
+}
+
+export interface SourceCode {
+  excerpts: CodeExcerpt[];
+  /** Short remark shown above the code, e.g. about a later fix. */
+  note?: Localized<string>;
+}
+
 export interface Project {
   /** Used in the URL: /projekte/<slug>/ and /en/projects/<slug>/ */
   slug: string;
@@ -100,6 +123,8 @@ export interface Project {
   /** "At a glance" strip on the detail page. Only facts that can be checked. */
   facts?: Localized<Fact[]>;
   caseStudy: Localized<CaseStudy>;
+  /** Only for projects that exist, and only code that may be published. Shown as the last chapter. */
+  sourceCode?: SourceCode;
 }
 
 export const projects: Project[] = [
@@ -224,6 +249,30 @@ export const projects: Project[] = [
         },
       ],
     },
+    sourceCode: {
+      excerpts: [
+        {
+          source: 'habitflow/schedule.js',
+          file: 'src/modules/schedule.js',
+          lang: 'js',
+          lines: [36, 70],
+          caption: {
+            de: 'Der Verlauf der Zeitpläne: ruleOn findet die Regel, die an einem bestimmten Tag galt, und applyScheduleChange fügt eine neue Regel ab heute hinzu, ohne die Vergangenheit zu ändern.',
+            en: 'The schedule history: ruleOn finds the rule that applied on a given day, and applyScheduleChange adds a new rule from today without changing the past.',
+          },
+        },
+        {
+          source: 'habitflow/stats.js',
+          file: 'src/modules/stats.js',
+          lang: 'js',
+          lines: [43, 63],
+          caption: {
+            de: 'Die aktuelle Serie wird vom heutigen Tag aus rückwärts gezählt. Tage, an denen die Gewohnheit nicht geplant war, werden übersprungen.',
+            en: 'The current streak is counted backwards from today. Days the habit was not scheduled for are skipped.',
+          },
+        },
+      ],
+    },
     caseStudy: {
       de: {
         overview:
@@ -233,7 +282,7 @@ export const projects: Project[] = [
         solution:
           'HabitFlow verbindet eine schlichte tägliche Erfassung mit Auswertungen über längere Zeit: Serien pro Gewohnheit, Wochen- und Monatsquoten, zwei Diagramme und ein Kalender, der jeden Tag als erledigt, teilweise erledigt oder verpasst zeigt. Gezählt werden nur Tage, an denen eine Gewohnheit geplant war.',
         implementation:
-          'Die Anwendung ist in JavaScript mit ES-Modulen geschrieben, ohne Framework, und wird mit Vite gebaut. Die Logik für Daten, Zeitpläne und Statistiken ist von der Darstellung getrennt und wird mit 39 automatisierten Tests auf dem Test-Runner von Node geprüft. Chart.js wird erst geladen, wenn die Statistikseite geöffnet wird. Gespeichert wird im localStorage des Browsers; die Daten lassen sich als JSON exportieren und wieder importieren.',
+          'Die Anwendung ist in JavaScript mit ES-Modulen geschrieben, ohne Framework, und wird mit Vite gebaut. Die Logik für Daten, Zeitpläne und Statistiken ist von der Darstellung getrennt und wird mit 39 automatisierten Tests auf dem Test-Runner von Node geprüft. Chart.js wird erst geladen, wenn die Statistikseite geöffnet wird. Gespeichert wird im localStorage des Browsers; die Daten lassen sich als JSON exportieren und wieder importieren. Ein grosser Teil des Codes ist mit Claude Code entstanden, einem KI-Assistenten fürs Programmieren. Ich habe festgelegt, was die Anwendung können soll, und die Ergebnisse vor der Veröffentlichung geprüft.',
         challenges:
           'Am meisten Sorgfalt brauchten die Datumslogik und die Zeitpläne. Tage richten sich nach dem lokalen Kalender statt nach UTC, damit sich ein Eintrag um Mitternacht nicht verschiebt. Und wenn man die Wochentage einer Gewohnheit ändert, darf das die Vergangenheit nicht umschreiben: Jede Gewohnheit führt deshalb einen Verlauf ihrer Zeitpläne.',
         learnings:
@@ -247,7 +296,7 @@ export const projects: Project[] = [
         solution:
           'HabitFlow combines a simple daily log with a view over longer periods: a streak for each habit, weekly and monthly completion rates, two charts, and a calendar that shows every day as done, partly done or missed. Only the days a habit was scheduled for are counted.',
         implementation:
-          "The application is written in JavaScript with ES modules, without a framework, and built with Vite. The logic for dates, schedules and statistics is kept separate from the interface and is checked by 39 automated tests on Node's test runner. Chart.js is only loaded when the statistics page is opened. Data is stored in the browser's localStorage and can be exported and imported as JSON.",
+          "The application is written in JavaScript with ES modules, without a framework, and built with Vite. The logic for dates, schedules and statistics is kept separate from the interface and is checked by 39 automated tests on Node's test runner. Chart.js is only loaded when the statistics page is opened. Data is stored in the browser's localStorage and can be exported and imported as JSON. A large part of the code was written with Claude Code, an AI coding assistant. I decided what the application should do and checked the results before publishing.",
         challenges:
           "The date logic and the schedules needed the most care. Days follow the local calendar instead of UTC, so an entry doesn't shift around midnight. And changing a habit's weekdays must not rewrite the past, so each habit keeps a history of its schedules.",
         learnings:
@@ -374,6 +423,20 @@ export const projects: Project[] = [
         },
       ],
     },
+    sourceCode: {
+      excerpts: [
+        {
+          source: 'ai-coding-mentor/evaluator.ts',
+          file: 'src/exercises/evaluator.ts',
+          lang: 'ts',
+          lines: [6, 32],
+          caption: {
+            de: 'Prüft eine einzelne Anforderung einer Übung anhand des Codetexts. Ausgeführt wird dabei nichts, deshalb lautet das Ergebnis nur «erkannt», «nicht erkannt» oder «nicht prüfbar».',
+            en: 'Checks a single requirement of an exercise against the text of the code. Nothing is executed, so the result is only "recognised", "not recognised" or "not verifiable".',
+          },
+        },
+      ],
+    },
     caseStudy: {
       de: {
         overview:
@@ -383,7 +446,7 @@ export const projects: Project[] = [
         solution:
           'Der Mentor bietet drei Aktionen: Erklären, Debuggen und Hinweis geben. Er ist eine Simulation: Feste, nachvollziehbare Regeln suchen im Code nach bekannten Mustern und wählen dazu vorbereitete Texte aus. Für denselben Code kommt immer dieselbe Antwort. Wenn nichts passt, sagt der Mentor das, statt etwas zu erfinden. In den Übungen vergleicht eine Anforderungsprüfung den Code mit dem, was die Aufgabe verlangt, zum Beispiel eine Funktion mit bestimmtem Namen, eine Schleife oder eine Rückgabe. Jede Anforderung wird als erkannt, nicht erkannt oder nicht überprüfbar gemeldet und begründet. Hinweise gibt es in drei Stufen, damit die Lösung nicht vorweggenommen wird.',
         implementation:
-          'Die Oberfläche ist mit React und TypeScript gebaut, Vite erstellt daraus statische Dateien. Als Editor dient Monaco, der erst nachgeladen wird, wenn die Seite sichtbar ist. Die Logik ist von der Oberfläche getrennt: Mentor und Übungssystem liegen in eigenen Modulen ohne React. Die Oberfläche spricht den Mentor nur über eine kleine Schnittstelle an, sodass er sich später durch einen echten Dienst ersetzen liesse. Bevor Regeln angewendet werden, blendet ein Vorverarbeitungsschritt Kommentare und Zeichenketten aus, damit Text darin keine Regel auslöst. Die Übungen sind reine Daten; jede Anforderung verweist auf eine typisierte Prüfung. Entwürfe werden im localStorage gespeichert und beim Laden validiert. 335 automatisierte Tests mit Vitest und React Testing Library decken Mentor, Übungsprüfung, Speicherung und Oberfläche ab.',
+          'Die Oberfläche ist mit React und TypeScript gebaut, Vite erstellt daraus statische Dateien. Als Editor dient Monaco, der erst nachgeladen wird, wenn die Seite sichtbar ist. Die Logik ist von der Oberfläche getrennt: Mentor und Übungssystem liegen in eigenen Modulen ohne React. Die Oberfläche spricht den Mentor nur über eine kleine Schnittstelle an, sodass er sich später durch einen echten Dienst ersetzen liesse. Bevor Regeln angewendet werden, blendet ein Vorverarbeitungsschritt Kommentare und Zeichenketten aus, damit Text darin keine Regel auslöst. Die Übungen sind reine Daten; jede Anforderung verweist auf eine typisierte Prüfung. Entwürfe werden im localStorage gespeichert und beim Laden validiert. 335 automatisierte Tests mit Vitest und React Testing Library decken Mentor, Übungsprüfung, Speicherung und Oberfläche ab. Ein grosser Teil des Codes ist mit Claude Code entstanden, einem KI-Assistenten fürs Programmieren. Ich habe festgelegt, was die Anwendung können soll, und die Ergebnisse vor der Veröffentlichung geprüft.',
         challenges:
           'Die grösste Schwierigkeit war die Ehrlichkeit der Rückmeldungen. Eine Prüfung, die nur Text vergleicht, darf eine Lösung nie als richtig bezeichnen. Deshalb gibt es die Kategorie «nicht überprüfbar», und die Zusammenfassung spricht von erkannten Mustern, nicht von bestandenen Tests. Ebenso wichtig war, Fehlalarme zu vermeiden: Auskommentierter Code oder Code in einer Zeichenkette darf nicht zählen, gängige alternative Schreibweisen dagegen schon. Beides ist mit Tests abgesichert.',
         limitations:
@@ -399,7 +462,7 @@ export const projects: Project[] = [
         solution:
           'The mentor offers three actions: Explain, Debug and Give hint. It is a simulation: fixed, transparent rules look for known patterns in the code and choose prepared texts to match. The same code always gets the same answer. When nothing matches, the mentor says so instead of making something up. In the exercises, a requirement check compares the code with what the task asks for, such as a function with a certain name, a loop or a return value. Each requirement is reported as recognised, not recognised or not verifiable, with a reason. Hints come in three levels, so the solution is not given away.',
         implementation:
-          'The interface is built with React and TypeScript, and Vite turns it into static files. The editor is Monaco, loaded only once the page is visible. Logic is kept apart from the interface: the mentor and the exercise system live in their own modules without React. The interface talks to the mentor through one small interface, so it could later be replaced by a real service. Before any rule is applied, a preprocessing step blanks out comments and strings so that text inside them cannot trigger a rule. Exercises are plain data, and each requirement refers to a typed check. Drafts are stored in localStorage and validated when loaded. 335 automated tests with Vitest and React Testing Library cover the mentor, the exercise checks, storage and the interface.',
+          'The interface is built with React and TypeScript, and Vite turns it into static files. The editor is Monaco, loaded only once the page is visible. Logic is kept apart from the interface: the mentor and the exercise system live in their own modules without React. The interface talks to the mentor through one small interface, so it could later be replaced by a real service. Before any rule is applied, a preprocessing step blanks out comments and strings so that text inside them cannot trigger a rule. Exercises are plain data, and each requirement refers to a typed check. Drafts are stored in localStorage and validated when loaded. 335 automated tests with Vitest and React Testing Library cover the mentor, the exercise checks, storage and the interface. A large part of the code was written with Claude Code, an AI coding assistant. I decided what the application should do and checked the results before publishing.',
         challenges:
           'The hardest part was keeping the feedback honest. A check that only compares text must never call a solution correct. That is why there is a "not verifiable" category, and why the summary speaks of recognised patterns rather than passed tests. Avoiding false alarms mattered just as much: commented-out code or code inside a string must not count, while common alternative ways of writing a solution should. Both are secured with tests.',
         limitations:
@@ -545,6 +608,20 @@ export const projects: Project[] = [
         },
       ],
     },
+    sourceCode: {
+      excerpts: [
+        {
+          source: 'everbound/player.gd',
+          file: 'assets/scripts/player.gd',
+          lang: 'gdscript',
+          lines: [59, 123],
+          caption: {
+            de: 'Schwerkraft, Bewegung, Angriff und Sprung der Spielfigur. Godot ruft _physics_process in jedem Physik-Frame auf.',
+            en: "The player character's gravity, movement, attack and jump. Godot calls _physics_process on every physics frame.",
+          },
+        },
+      ],
+    },
     caseStudy: {
       de: {
         overview:
@@ -684,6 +761,20 @@ export const projects: Project[] = [
         'Existing files are never overwritten',
       ],
     },
+    sourceCode: {
+      excerpts: [
+        {
+          source: 'week-planner/Program.cs',
+          file: 'Program.cs',
+          lang: 'csharp',
+          lines: [41, 88],
+          caption: {
+            de: 'Die Wochenlogik: Das Programm sucht den ersten Montag des Monats, bestimmt die Kalenderwoche nach ISO 8601 und legt für jeden Arbeitstag eine Datei aus der Vorlage an, ohne bestehende Dateien zu überschreiben.',
+            en: 'The week logic: the program finds the first Monday of the month, works out the ISO 8601 calendar week and creates a file from the template for each working day, without overwriting existing files.',
+          },
+        },
+      ],
+    },
     caseStudy: {
       de: {
         overview:
@@ -746,6 +837,23 @@ export const projects: Project[] = [
         'Add tasks and remove them by their number',
         'Invalid numbers are caught with try/except',
         'A message when the list is empty',
+      ],
+    },
+    sourceCode: {
+      note: {
+        de: 'Der Aufruf von main() am Ende der Datei wurde am 19. November 2026 ergänzt. Vorher wurde das Programm beim Ausführen nicht gestartet.',
+        en: 'The call to main() at the end of the file was added on 19 November 2026. Before that, running the file did not start the program.',
+      },
+      excerpts: [
+        {
+          source: 'python-task-manager/tasks.py',
+          file: 'tasks = [].py',
+          lang: 'python',
+          caption: {
+            de: 'Das ganze Programm: die Menüschleife und die Funktionen zum Anzeigen, Hinzufügen und Entfernen von Aufgaben.',
+            en: 'The whole program: the menu loop and the functions for showing, adding and removing tasks.',
+          },
+        },
       ],
     },
     caseStudy: {
